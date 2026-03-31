@@ -1,122 +1,133 @@
 <!doctype html>
 <html lang="uz">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Trading Journal</title>
-    <link rel="stylesheet" href="/css/main.css" />
-  </head>
-  <body>
-    <div class="container">
-      <h1>Assalomu alaykum</h1>
-      <h2>Hush kelibsiz Muhammadaziz</h2>
-      <h2>Savdolar qanday bo'ldi? Shepim???</h2>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trading Journal</title>
+  <link rel="stylesheet" href="/css/main.css" />
+</head>
 
-      <form class="form">
-        <div class="grid">
-          <div class="field">
-            <label>Sana</label>
-            <input type="date" />
-          </div>
+<body>
+  <div class="container">
 
-          <div class="field">
-            <label>Vaqt</label>
-            <input type="time" />
-          </div>
-          <div class="field">
-            <label>Aktiv</label>
-            <input type="text" placeholder="Masalan: EUR/USD" />
-          </div>
+    <h1>Trading Journal</h1>
+    <h2>Hush kelibsiz Muhammadaziz</h2>
 
-          <div class="field">
-            <label>Strategiya</label>
-            <input type="text" />
-          </div>
+    <form class="form">
+      <div class="grid">
 
-          <div class="field">
-            <label>Trend yo‘nalishi</label>
-            <input type="text" />
-          </div>
-
-          <div class="field full">
-            <label>Kirish sababi</label>
-            <textarea></textarea>
-          </div>
-
-          <div class="field">
-            <label>Hisob balansi</label>
-            <input type="number" />
-          </div>
-
-          <div class="field">
-            <label>Kirish narxi</label>
-            <input type="number" />
-          </div>
-
-          <div class="field">
-            <label>SL</label>
-            <input type="number" />
-          </div>
-          <div class="field">
-            <label>TP</label>
-            <input type="number" />
-          </div>
-
-          <div class="field">
-            <label>Xavf/Foyda nisbati</label>
-            <input type="text" />
-          </div>
-
-          <div class="field">
-            <label>Lot hajmi</label>
-            <input type="number" />
-          </div>
-
-          <div class="field">
-            <label>Natija</label>
-            <input type="text" placeholder="Win / Loss" />
-          </div>
-
-          <div class="field">
-            <label>Foyda/Ziyon</label>
-            <input type="number" />
-          </div>
-
-          <div class="field">
-            <label>Davomiyligi</label>
-            <input type="text" />
-          </div>
-
-          <div class="field full">
-            <label>Oldingi hissiyot</label>
-            <textarea></textarea>
-          </div>
-
-          <div class="field full">
-            <label>Jarayon paytidagi hissiyot</label>
-            <textarea></textarea>
-          </div>
-          <div class="field full">
-            <label>Yakuniy hissiyot</label>
-            <textarea></textarea>
-          </div>
-
-          <div class="field full">
-            <label>Xatolar</label>
-            <textarea></textarea>
-          </div>
-
-          <div class="field full">
-            <label>To‘g‘ri qilingan ishlar</label>
-            <textarea></textarea>
-          </div>
+        <div class="field">
+          <label>Sana</label>
+          <input type="date" name="sana" />
         </div>
 
-        <button type="submit">Saqlash</button>
-      </form>
+        <div class="field">
+          <label>Vaqt</label>
+          <input type="time" name="vaqt" />
+        </div>
+
+        <div class="field">
+          <label>Aktiv</label>
+          <input type="text" name="aktiv" />
+        </div>
+
+        <div class="field">
+          <label>Strategiya</label>
+          <input type="text" name="strategiya" />
+        </div>
+
+        <div class="field">
+          <label>Trend</label>
+          <input type="text" name="trend" />
+        </div>
+
+        <div class="field full">
+          <label>Kirish sababi</label>
+          <textarea name="sabab"></textarea>
+        </div>
+
+        <div class="field">
+          <label>Balans</label>
+          <input type="number" name="balans" />
+        </div>
+
+        <div class="field">
+          <label>Kirish</label>
+          <input type="number" name="kirish" />
+        </div>
+
+        <div class="field">
+          <label>SL</label>
+          <input type="number" name="sl" />
+        </div>
+
+        <div class="field">
+          <label>TP</label>
+          <input type="number" name="tp" />
+        </div>
+
+        <div class="field">
+          <label>RR</label>
+          <input type="text" name="rr" />
+        </div>
+
+        <div class="field">
+          <label>Lot</label>
+          <input type="number" name="lot" />
+        </div>
+
+        <div class="field">
+          <label>Natija</label>
+          <input type="text" name="natija" />
+        </div>
+
+        <div class="field">
+          <label>Foyda</label>
+          <input type="number" name="foyda" />
+        </div>
+
+        <div class="field">
+          <label>Davomiyligi</label>
+          <input type="text" name="davom" />
+        </div>
+
+        <div class="field full">
+          <label>Oldingi hissiyot</label>
+          <textarea name="oldHiss"></textarea>
+        </div>
+
+        <div class="field full">
+          <label>Jarayon paytidagi hissiyot</label>
+          <textarea name="jarayonHiss"></textarea>
+        </div>
+
+        <div class="field full">
+          <label>Yakuniy hissiyot</label>
+          <textarea name="yakunHiss"></textarea>
+        </div>
+
+        <div class="field full">
+          <label>Xatolar</label>
+          <textarea name="xato"></textarea>
+        </div>
+
+        <div class="field full">
+          <label>To‘g‘ri ishlar</label>
+          <textarea name="togri"></textarea>
+        </div>
+
+      </div>
+
+      <button type="submit">Saqlash</button>
+    </form>
+
+    <div class="trades-container">
+      <h2>📊 Trades</h2>
+      <div id="tradesList"></div>
     </div>
 
+  </div>
 
-    <script src="/js/app.js"></script>
-  </body>
+  <script src="/js/app.js"></script>
+</body>
 </html>

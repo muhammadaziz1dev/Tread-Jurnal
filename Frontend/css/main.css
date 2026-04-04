@@ -1,0 +1,213 @@
+:root {
+    --bg: #0b0e14;
+    --card-bg: #151921;
+    --field-bg: #1e232d;
+    --border: #2a2e39;
+    --accent: #2962ff;
+    --success: #00c805;
+    --danger: #ff3b30;
+    --text: #d1d4dc;
+    --text-white: #ffffff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    padding: 40px 20px;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Header */
+.main-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+h1 { color: var(--text-white); font-size: 2.5rem; }
+.welcome-text span { color: var(--accent); font-weight: 700; }
+
+/* Dashboard */
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 40px;
+}
+
+.dashboard .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.dashboard .card i { display: block; margin-bottom: 8px; font-size: 1.2rem; color: var(--accent); }
+
+/* Form */
+.form {
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    margin-bottom: 50px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.field { display: flex; flex-direction: column; gap: 8px; }
+.field.full { grid-column: 1 / -1; }
+
+label { font-size: 0.85rem; color: #848e9c; font-weight: 500; }
+label i { margin-right: 5px; color: var(--accent); }
+
+input, textarea, select {
+    background: var(--field-bg);
+    border: 1px solid var(--border);
+    padding: 12px;
+    border-radius: 8px;
+    color: var(--text-white);
+    outline: none;
+    transition: 0.2s;
+}
+
+input:focus, textarea:focus { border-color: var(--accent); }
+
+.textarea-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.submit-btn {
+    margin-top: 30px;
+    width: 100%;
+    padding: 15px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+/* Trade Cards */
+.trade-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 15px 25px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+}
+
+.trade-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.trade-main-info {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+.trade-symbol { font-weight: 700; color: var(--text-white); font-size: 1.1rem; }
+.trade-result.win { color: var(--success); }
+.trade-profit { font-weight: 600; color: var(--success); }
+
+.trade-actions { display: flex; gap: 10px; }
+
+.icon-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.icon-btn.edit { color: #848e9c; }
+.icon-btn.edit:hover { color: var(--accent); }
+.icon-btn.delete { color: #848e9c; }
+.icon-btn.delete:hover { color: var(--danger); }
+.card.loss i {
+    color: #ff3b30; /* Qizil rang */
+}
+.trade-card-content {
+    display: flex;
+    justify-content: space-between; /* Ma'lumotlar chapda, tugmalar o'ngda */
+    align-items: flex-start; /* Tugmalar tepadan tekislanadi */
+    padding: 15px;
+    background: #151921;
+    border-radius: 10px;
+    border: 1px solid #2a2e39;
+}
+
+.trade-info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: #d1d4dc;
+}
+
+.info-item i {
+    width: 16px;
+    color: #848e9c;
+}
+
+/* Icon tugmalar stili */
+.trade-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 5px;
+    transition: all 0.2s ease;
+    color: #848e9c; /* Standart rang */
+}
+
+/* Hover effekti */
+.icon-btn.edit:hover {
+    color: #2962ff; /* Ko'k */
+    transform: scale(1.1);
+}
+
+.icon-btn.delete:hover {
+    color: #ff3b30; /* Qizil */
+    transform: scale(1.1);
+}
+
+/* Status ranglari */
+.status-tp { color: #00c805; font-weight: 600; }
+.profit-val { color: #00c805; }

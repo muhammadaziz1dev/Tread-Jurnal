@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trading Journal | Muhammadaziz</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/Frontend/css/main.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header class="main-header">
+        <h1>Trading Journal</h1>
+        <p class="welcome-text">Xush kelibsiz, <span>Muhammadaziz</span></p>
+      </header>
+
+      <div class="dashboard">
+        <div class="card">
+          <i class="fa-solid fa-layer-group"></i> Total:
+          <span id="totalTrades">0</span>
+        </div>
+        <div class="card win">
+          <i class="fa-solid fa-chart-line"></i> Wins: <span id="wins">0</span>
+        </div>
+        <div class="card loss">
+          <i class="fa-solid fa-arrow-trend-down"></i> Losses:
+          <span id="losses">0</span>
+        </div>
+        <div class="card rate">
+          <i class="fa-solid fa-percentage"></i> Winrate:
+          <span id="winrate">0</span>%
+        </div>
+        <div class="card profit">
+          <i class="fa-solid fa-wallet"></i> Profit:
+          <span id="totalProfit">0</span>
+        </div>
+        <div class="card rr">
+          <i class="fa-solid fa-scale-balanced"></i> Avg RR:
+          <span id="avgRR">0</span>
+        </div>
+      </div>
+
+      <form id="tradeForm" class="form">
+        <div class="grid">
+          <div class="field">
+            <label><i class="fa-regular fa-calendar"></i> Sana</label>
+            <input type="date" name="sana" />
+          </div>
+          <div class="field">
+            <label><i class="fa-regular fa-clock"></i> Vaqt</label>
+            <input type="time" name="vaqt" />
+          </div>
+          <div class="field">
+            <label><i class="fa-solid fa-coins"></i> Aktiv</label>
+            <input type="text" name="aktiv" placeholder="Masalan: XAUUSD" />
+          </div>
+          <div class="field">
+            <label
+              ><i class="fa-solid fa-wand-magic-sparkles"></i> Strategiya</label
+            >
+            <input type="text" name="strategiya" />
+          </div>
+          <div class="field">
+            <label><i class="fa-solid fa-arrow-trend-up"></i> Trend</label>
+            <input type="text" name="trend" />
+          </div>
+          <div class="field">
+            <label><i class="fa-solid fa-vault"></i> Balans</label>
+            <input type="number" name="balans" />
+          </div>
+          <div class="field">
+            <label><i class="fa-solid fa-right-to-bracket"></i> Kirish</label>
+            <input type="number" name="kirish" />
+          </div>
+          <div class="field">
+            <label><i class="fa-solid fa-shield-halved"></i> SL</label>
+            <input type="number" name="sl" />
+          </div>
+          <div class="field">
+            <label><i class="fa-solid fa-bullseye"></i> TP</label>
+            <input type="number" name="tp" />
+          </div>
+          <div class="field">
+            <label><i class="fa-solid fa-scale-unbalanced"></i> RR</label>
+            <input type="text" name="rr" />
+          </div>
+          <div class="field">
+            <label><i class="fa-solid fa-weight-hanging"></i> Lot</label>
+            <input type="number" name="lot" />
+          </div>
+          <div class="field">
+            <label><i class="fa-solid fa-flag-checkered"></i> Natija</label>
+            <select name="natija" id="result">
+              <option value="win">Win</option>
+              <option value="loss">Loss</option>
+            </select>
+          </div>
+          <div class="field">
+            <label><i class="fa-solid fa-dollar-sign"></i> Foyda</label>
+            <input type="number" name="foyda" id="profit" />
+          </div>
+          <div class="field">
+            <label><i class="fa-solid fa-triangle-exclamation"></i> Risk</label>
+            <input type="number" id="risk" />
+          </div>
+          <div class="field">
+            <label
+              ><i class="fa-solid fa-hourglass-half"></i> Davomiyligi</label
+            >
+            <input type="text" name="davom" />
+          </div>
+          <div class="field full">
+            <label
+              ><i class="fa-solid fa-comment-dots"></i> Kirish sababi</label
+            >
+            <textarea name="sabab"></textarea>
+          </div>
+          <div class="field full">
+            <label
+              ><i class="fa-solid fa-brain"></i> Hissiyotlar
+              (Oldin/Jarayon/Yakun)</label
+            >
+            <div class="textarea-group">
+              <textarea name="oldHiss" placeholder="Oldin..."></textarea>
+              <textarea name="jarayonHiss" placeholder="Jarayon..."></textarea>
+              <textarea name="yakunHiss" placeholder="Yakun..."></textarea>
+            </div>
+          </div>
+          <div class="field full">
+            <label
+              ><i class="fa-solid fa-circle-xmark"></i> Xatolar va To'g'ri
+              ishlar</label
+            >
+            <div class="textarea-group">
+              <textarea name="xato" placeholder="Xatolar..."></textarea>
+              <textarea name="togri" placeholder="To'g'ri ishlar..."></textarea>
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="submit-btn">
+          Saqlash <i class="fa-solid fa-floppy-disk"></i>
+        </button>
+      </form>
+
+      <div id="tradesList" class="trades-container"></div>
+
+    </div>
+
+    <script src="/Frontend/js/app.js"></script>
+  </body>
+</html>

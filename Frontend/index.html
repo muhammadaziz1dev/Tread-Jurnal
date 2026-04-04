@@ -12,7 +12,8 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
-    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="./css/main.css" />
+    <link rel="shortcut icon" href="./assets/logo/my-logo.jpg" type="image/x-icon">
   </head>
   <body>
     <div class="container">
@@ -39,7 +40,7 @@
         </div>
         <div class="card profit">
           <i class="fa-solid fa-wallet"></i> Profit:
-          <span id="totalProfit">0</span>
+          <span id="totalProfit">0</span> USD
         </div>
         <div class="card rr">
           <i class="fa-solid fa-scale-balanced"></i> Avg RR:
@@ -51,7 +52,7 @@
         <div class="grid">
           <div class="field">
             <label><i class="fa-regular fa-calendar"></i> Sana</label>
-            <input type="date" name="sana" />
+            <input type="date" name="sana" required />
           </div>
           <div class="field">
             <label><i class="fa-regular fa-clock"></i> Vaqt</label>
@@ -59,12 +60,10 @@
           </div>
           <div class="field">
             <label><i class="fa-solid fa-coins"></i> Aktiv</label>
-            <input type="text" name="aktiv" placeholder="Masalan: XAUUSD" />
+            <input type="text" name="aktiv" placeholder="Masalan: XAUUSD" required />
           </div>
           <div class="field">
-            <label
-              ><i class="fa-solid fa-wand-magic-sparkles"></i> Strategiya</label
-            >
+            <label><i class="fa-solid fa-wand-magic-sparkles"></i> Strategiya</label>
             <input type="text" name="strategiya" />
           </div>
           <div class="field">
@@ -73,19 +72,19 @@
           </div>
           <div class="field">
             <label><i class="fa-solid fa-vault"></i> Balans</label>
-            <input type="number" name="balans" />
+            <input type="number" step="any" name="balans" />
           </div>
           <div class="field">
             <label><i class="fa-solid fa-right-to-bracket"></i> Kirish</label>
-            <input type="number" name="kirish" />
+            <input type="number" step="any" name="kirish" />
           </div>
           <div class="field">
             <label><i class="fa-solid fa-shield-halved"></i> SL</label>
-            <input type="number" name="sl" />
+            <input type="number" step="any" name="sl" />
           </div>
           <div class="field">
             <label><i class="fa-solid fa-bullseye"></i> TP</label>
-            <input type="number" name="tp" />
+            <input type="number" step="any" name="tp" />
           </div>
           <div class="field">
             <label><i class="fa-solid fa-scale-unbalanced"></i> RR</label>
@@ -93,51 +92,44 @@
           </div>
           <div class="field">
             <label><i class="fa-solid fa-weight-hanging"></i> Lot</label>
-            <input type="number" name="lot" />
+            <input type="number" step="any" name="lot" />
           </div>
           <div class="field">
             <label><i class="fa-solid fa-flag-checkered"></i> Natija</label>
-            <select name="natija" id="result">
+            <select name="natija">
               <option value="win">Win</option>
               <option value="loss">Loss</option>
             </select>
           </div>
           <div class="field">
             <label><i class="fa-solid fa-dollar-sign"></i> Foyda</label>
-            <input type="number" name="foyda" id="profit" />
+            <input type="number" step="any" name="foyda" required />
           </div>
           <div class="field">
-            <label><i class="fa-solid fa-triangle-exclamation"></i> Risk</label>
-            <input type="number" id="risk" />
+            <label><i class="fa-solid fa-triangle-exclamation"></i> Risk %</label>
+            <input type="number" step="any" name="risk" />
           </div>
           <div class="field">
-            <label
-              ><i class="fa-solid fa-hourglass-half"></i> Davomiyligi</label
-            >
+            <label><i class="fa-solid fa-hourglass-half"></i> Davomiyligi</label>
             <input type="text" name="davom" />
           </div>
+
           <div class="field full">
-            <label
-              ><i class="fa-solid fa-comment-dots"></i> Kirish sababi</label
-            >
+            <label><i class="fa-solid fa-comment-dots"></i> Kirish sababi</label>
             <textarea name="sabab"></textarea>
           </div>
+
           <div class="field full">
-            <label
-              ><i class="fa-solid fa-brain"></i> Hissiyotlar
-              (Oldin/Jarayon/Yakun)</label
-            >
+            <label><i class="fa-solid fa-brain"></i> Hissiyotlar (Oldin / Jarayon / Yakun)</label>
             <div class="textarea-group">
               <textarea name="oldHiss" placeholder="Oldin..."></textarea>
               <textarea name="jarayonHiss" placeholder="Jarayon..."></textarea>
               <textarea name="yakunHiss" placeholder="Yakun..."></textarea>
             </div>
           </div>
+
           <div class="field full">
-            <label
-              ><i class="fa-solid fa-circle-xmark"></i> Xatolar va To'g'ri
-              ishlar</label
-            >
+            <label><i class="fa-solid fa-circle-xmark"></i> Xatolar va To'g'ri ishlar</label>
             <div class="textarea-group">
               <textarea name="xato" placeholder="Xatolar..."></textarea>
               <textarea name="togri" placeholder="To'g'ri ishlar..."></textarea>
@@ -150,9 +142,8 @@
       </form>
 
       <div id="tradesList" class="trades-container"></div>
-
     </div>
 
-    <script src="/js/app.js"></script>
+    <script src="./js/app.js"></script>
   </body>
 </html>

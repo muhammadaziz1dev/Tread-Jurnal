@@ -5,174 +5,110 @@ const API_URL = "https://tread-jurnal.onrender.com/api/trades";
 const form = document.querySelector("#tradeForm");
 const tradesList = document.querySelector("#tradesList");
 const searchInput = document.getElementById("searchInput");
+const submitBtn = document.getElementById("submitBtn");
 const loader = document.getElementById("loader");
 
 let allTrades = []; 
 let editMode = false;
 let editId = null;
 
-const stats = {
-    total: document.getElementById("totalTrades"),
-    wins: document.getElementById("wins"),
-    losses: document.getElementById("losses"),
-    winrate: document.getElementById("winrate"),
-    profit: document.getElementById("totalProfit"),
-    avgRR: document.getElementById("avgRR")
-};
-
-// 1. Loading Spinnerni boshqarish
-function toggleLoading(show) {
-    if (loader) loader.style.display = show ? "block" : "none";
-}
-
-// 2. Auto-Calculate RR (Kirish, SL, TP o'zgarganda)
-const inputsRR = ['kirish', 'sl', 'tp'].map(name => document.getElementsByName(name)[0]);
-inputsRR.forEach(input => {
-    if (input) {
-        input.addEventListener('input', () => {
-            const entry = parseFloat(document.getElementsByName('kirish')[0].value);
-            const sl = parseFloat(document.getElementsByName('sl')[0].value);
-            const tp = parseFloat(document.getElementsByName('tp')[0].value);
-
-            if (entry && sl && tp) {
-                const risk = Math.abs(entry - sl);
-                const reward = Math.abs(tp - entry);
-                if (risk !== 0) {
-                    const rrValue = (reward / risk).toFixed(2);
-                    document.getElementsByName('rr')[0].value = `1:${rrValue}`;
-                }
-            }
-        });
-    }
-});
-
-// 3. Ma'lumotlarni serverdan olish
-async function fetchTrades() {
-    toggleLoading(true);
-    try {
-        const response = await fetch(API_URL);
-        if (!response.ok) throw new Error("Server xatosi");
-        allTrades = await response.json();
-        return Array.isArray(allTrades) ? allTrades : [];
-    } catch (e) {
-        console.error("Xatolik:", e);
-        return [];
-    } finally {
-        toggleLoading(false);
-    }
-}
-
-// 4. Dashboardni yangilash
+// 1. Dashboardni yangilash
 function updateDashboard(trades) {
     const total = trades.length;
     const wins = trades.filter(t => String(t.natija).toLowerCase() === "win").length;
     const losses = trades.filter(t => String(t.natija).toLowerCase() === "loss").length;
     const totalProfit = trades.reduce((sum, t) => sum + (parseFloat(t.foyda) || 0), 0);
+    const winrate = total > 0 ? ((wins / total) * 100).toFixed(1) : 0;
     
     const avgRR = total > 0 ? (trades.reduce((sum, t) => {
         let val = String(t.rr).includes(':') ? parseFloat(t.rr.split(':')[1]) : parseFloat(t.rr);
         return sum + (val || 0);
     }, 0) / total).toFixed(2) : 0;
 
-    if (stats.total) stats.total.textContent = total;
-    if (stats.wins) stats.wins.textContent = wins;
-    if (stats.losses) stats.losses.textContent = losses;
-    if (stats.winrate) stats.winrate.textContent = total ? ((wins / total) * 100).toFixed(1) : 0;
-    if (stats.profit) stats.profit.textContent = totalProfit.toLocaleString();
-    if (stats.avgRR) stats.avgRR.textContent = avgRR;
+    document.getElementById("totalTrades").textContent = total;
+    document.getElementById("wins").textContent = wins;
+    document.getElementById("losses").textContent = losses;
+    document.getElementById("winrate").textContent = winrate;
+    document.getElementById("totalProfit").textContent = totalProfit.toLocaleString();
+    document.getElementById("avgRR").textContent = avgRR;
 }
 
-// 5. Render (Savdolarni ko'rsatish)
-async function renderTrades(tradesToRender = null) {
-    if (!tradesList) return;
-    const trades = tradesToRender !== null ? tradesToRender : await fetchTrades();
-    tradesList.innerHTML = "";
-
-    if (trades.length === 0) {
-        tradesList.innerHTML = "<p style='text-align:center; padding:20px;'>Ma'lumot topilmadi.</p>";
-        updateDashboard(tradesToRender !== null ? tradesToRender : []);
-        return;
-    }
-
-    trades.forEach((trade) => {
-        const card = document.createElement("div");
-        card.className = `trade-card ${trade.natija}`;
-        const isWin = String(trade.natija).toLowerCase() === 'win';
-
-        card.innerHTML = `
-            <div class="trade-card-content">
-                <div class="trade-info-list">
-                    <div class="info-item"><i class="fa-regular fa-calendar"></i> ${trade.sana || '---'}</div>
-                    <div class="info-item"><b>${trade.aktiv || '---'}</b></div>
-                    <div class="info-item ${isWin ? 'status-tp' : 'status-sl'}">
-                        <i class="fa-solid ${isWin ? 'fa-circle-check' : 'fa-circle-xmark'}"></i> 
-                        ${(trade.natija || '---').toUpperCase()}
-                    </div>
-                    <div class="info-item profit-val" style="color: ${parseFloat(trade.foyda) >= 0 ? '#00c805' : '#ff3b30'}">
-                        <b>${trade.foyda || 0} USD</b>
-                    </div>
-                </div>
-                <div class="trade-actions">
-                    <button class="icon-btn edit" onclick="startEdit('${trade._id}')">
-                        <i class="fa-solid fa-pen-to-square"></i>
-                    </button>
-                    <button class="icon-btn delete" onclick="deleteTrade('${trade._id}')">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
-                </div>
-            </div>
-        `;
-        tradesList.appendChild(card);
-    });
+// 2. Telegramga xabar yuborish (Yangi yoki Tahrirlangan)
+async function sendToTelegram(data, isEdit = false) {
+    const title = isEdit ? "♻️ <b>TRADE YANGILANDI (EDIT)</b>" : "📊 <b>YANGI TRADE SAQLANDI</b>";
+    const message = `${title}\n` +
+                    `──────────────────\n` +
+                    `📅 Sana: ${data.sana}\n` +
+                    `💱 Aktiv: ${data.aktiv}\n` +
+                    `📈 Natija: ${data.natija.toUpperCase()}\n` +
+                    `💵 Foyda: ${data.foyda} USD\n` +
+                    `🎯 RR: ${data.rr}\n` +
+                    `──────────────────`;
     
-    if (tradesToRender === null) updateDashboard(allTrades);
-}
-
-// 6. Search (Qidiruv) funksiyasi
-if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        const filtered = allTrades.filter(t => 
-            (t.aktiv && t.aktiv.toLowerCase().includes(term)) || 
-            (t.natija && t.natija.toLowerCase().includes(term))
-        );
-        renderTrades(filtered);
-    });
-}
-
-// 7. Telegramga yuborish
-async function sendToTelegram(data) {
-    const message = `📊 <b>Yangi Trade</b>\n💱 Aktiv: ${data.aktiv}\n🎯 Strategiya: ${data.strategiya || '---'}\n📈 Natija: ${data.natija.toUpperCase()}\n💵 Foyda: ${data.foyda} USD`;
     try {
         await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ chat_id: CHAT_ID, text: message, parse_mode: "HTML" })
         });
-    } catch (e) { console.error("Telegram xatosi:", e); }
+    } catch (e) { console.error("Telegram error:", e); }
 }
 
-// 8. Tahrirlashni boshlash (Formani to'ldirish)
-window.startEdit = function(id) {
-    const trade = allTrades.find(t => t._id === id);
-    if (!trade) return;
-
-    editMode = true;
-    editId = id;
-
-    // Formadagi barcha inputlarni trade ma'lumotlari bilan to'ldirish
-    Object.keys(trade).forEach(key => {
-        const input = form.elements[key];
-        if (input) input.value = trade[key];
-    });
-
-    const submitBtn = document.getElementById("submitBtn");
-    if (submitBtn) submitBtn.innerHTML = 'Yangilash <i class="fa-solid fa-rotate"></i>';
+// 3. Ma'lumotlarni ko'rsatish
+async function renderTrades(tradesToRender = null) {
+    if (loader) loader.style.display = "block";
     
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-};
+    try {
+        // Agar tashqaridan ma'lumot kelmasa, serverdan yangisini olamiz
+        if (tradesToRender === null) {
+            const response = await fetch(API_URL);
+            allTrades = await response.json();
+        }
 
-// 9. Formani saqlash (POST yoki PUT)
+        const list = tradesToRender || allTrades;
+        tradesList.innerHTML = "";
+        
+        if (list.length === 0) {
+            tradesList.innerHTML = "<p style='text-align:center; padding:20px;'>Ma'lumot topilmadi.</p>";
+        } else {
+            list.forEach(trade => {
+                const isWin = String(trade.natija).toLowerCase() === 'win';
+                const card = document.createElement("div");
+                card.className = `trade-card ${trade.natija}`;
+                card.innerHTML = `
+                    <div class="trade-card-content">
+                        <div class="trade-info-list">
+                            <div class="info-item"><i class="fa-regular fa-calendar"></i> ${trade.sana || '---'}</div>
+                            <div class="info-item"><b>${trade.aktiv || '---'}</b></div>
+                            <div class="info-item ${isWin ? 'status-tp' : 'status-sl'}">
+                                <i class="fa-solid ${isWin ? 'fa-circle-check' : 'fa-circle-xmark'}"></i> 
+                                ${(trade.natija || '---').toUpperCase()}
+                            </div>
+                            <div class="info-item profit-val" style="color: ${parseFloat(trade.foyda) >= 0 ? '#00c805' : '#ff3b30'}">
+                                <b>${trade.foyda || 0} USD</b>
+                            </div>
+                        </div>
+                        <div class="trade-actions">
+                            <button class="icon-btn edit" onclick="startEdit('${trade._id}')">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button class="icon-btn delete" onclick="deleteTrade('${trade._id}')">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </div>`;
+                tradesList.appendChild(card);
+            });
+        }
+        updateDashboard(list);
+    } catch (e) { 
+        console.error("Render xatosi:", e); 
+    } finally {
+        if (loader) loader.style.display = "none";
+    }
+}
+
+// 4. Saqlash yoki Yangilash
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const formData = new FormData(form);
@@ -189,35 +125,78 @@ form.addEventListener("submit", async (e) => {
         });
 
         if (response.ok) {
-            if (!editMode) await sendToTelegram(data);
+            // Telegramga yuborish (Edit mode bo'lsa ham yuboradi)
+            await sendToTelegram(data, editMode);
             
+            // Rejimni tozalash
             editMode = false;
             editId = null;
             form.reset();
             
-            const submitBtn = document.getElementById("submitBtn");
             if (submitBtn) submitBtn.innerHTML = 'Saqlash <i class="fa-solid fa-floppy-disk"></i>';
             
-            await renderTrades();
+            // Muhim: null yuboramizki, renderTrades serverdan yangi ma'lumotni qayta yuklasin
+            await renderTrades(null); 
             alert("Amal muvaffaqiyatli bajarildi! ✅");
+        } else {
+            alert("Serverga saqlashda xato yuz berdi.");
         }
     } catch (e) {
-        alert("Xatolik yuz berdi!");
+        alert("Tarmoq xatosi yoki server o'chiq!");
     }
 });
 
-// 10. O'chirish
+// 5. Tahrirlashni boshlash
+window.startEdit = function(id) {
+    const trade = allTrades.find(t => t._id === id);
+    if (!trade) return;
+
+    editMode = true;
+    editId = id;
+
+    // Formani to'ldirish
+    Object.keys(trade).forEach(key => {
+        const input = form.elements[key];
+        if (input) input.value = trade[key];
+    });
+
+    if (submitBtn) submitBtn.innerHTML = 'Yangilash <i class="fa-solid fa-rotate"></i>';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+// 6. Qidiruv
+if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        const filtered = allTrades.filter(t => 
+            (t.aktiv && t.aktiv.toLowerCase().includes(term)) || 
+            (t.natija && t.natija.toLowerCase().includes(term))
+        );
+        renderTrades(filtered);
+    });
+}
+
+// 7. O'chirish
 window.deleteTrade = async function(id) {
     if (!confirm("Haqiqatdan ham ushbu savdoni o'chirmoqchimisiz?")) return;
     try {
         const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-        if (res.ok) {
-            await renderTrades();
-        }
-    } catch (e) {
-        console.error("O'chirishda xato:", e);
-    }
+        if (res.ok) await renderTrades(null);
+    } catch (e) { console.error("O'chirishda xato:", e); }
 };
 
-// Sahifa yuklanganda ishga tushirish
-document.addEventListener("DOMContentLoaded", renderTrades);
+// 8. Auto RR
+form.addEventListener('input', () => {
+    const entry = parseFloat(form.elements['kirish'].value);
+    const sl = parseFloat(form.elements['sl'].value);
+    const tp = parseFloat(form.elements['tp'].value);
+    if (entry && sl && tp) {
+        const risk = Math.abs(entry - sl);
+        const reward = Math.abs(tp - entry);
+        if (risk !== 0) {
+            form.elements['rr'].value = `1:${(reward / risk).toFixed(2)}`;
+        }
+    }
+});
+
+document.addEventListener("DOMContentLoaded", () => renderTrades(null));

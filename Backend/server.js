@@ -56,3 +56,31 @@ app.delete('/api/trades/:id', async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 });
+// Ma'lumotlarni JSON formatida qabul qilish uchun (shart!)
+app.use(express.json()); 
+
+// Trade Schema (Validation xatolarini oldini olish uchun hamma maydonni String qilamiz)
+const tradeSchema = new mongoose.Schema({
+    sana: String, vaqt: String, aktiv: String, strategiya: String,
+    trend: String, balans: String, kirish: String, sl: String,
+    tp: String, rr: String, lot: String, natija: String,
+    foyda: String, risk: String, davom: String, sabab: String,
+    oldHiss: String, jarayonHiss: String, yakunHiss: String,
+    xato: String, togri: String
+});
+
+const Trade = mongoose.model('Trade', tradeSchema);
+
+// POST yo'nalishi
+app.post('/api/trades', async (req, res) => {
+    try {
+        const newTrade = new Trade(req.body);
+        await newTrade.save();
+        
+        // Telegramga yuborish qismi (ixtiyoriy, agar bot sozlangan bo'lsa)
+        res.status(201).json(newTrade);
+    } catch (error) {
+        console.error("Serverda xato:", error);
+        res.status(400).json({ message: error.message });
+    }
+});

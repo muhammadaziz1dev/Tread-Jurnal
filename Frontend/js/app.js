@@ -18,6 +18,7 @@ const stats = {
 async function fetchTrades() {
     try {
         const response = await fetch(API_URL);
+        if (!response.ok) throw new Error("Serverdan ma'lumot olishda xato");
         return await response.json();
     } catch (e) {
         console.error("Xatolik:", e);
@@ -26,9 +27,9 @@ async function fetchTrades() {
 }
 
 // 2. Dashboardni yangilash
-async function updateDashboard(trades) {
+function updateDashboard(trades) {
     const total = trades.length;
-    const wins = trades.filter(t => t.natija === "win").length;
+    const wins = trades.filter(t => String(t.natija).toLowerCase() === "win").length;
     const losses = total - wins;
     const winrate = total > 0 ? ((wins / total) * 100).toFixed(1) : 0;
     const totalProfit = trades.reduce((sum, t) => sum + (Number(t.foyda) || 0), 0);
@@ -37,8 +38,8 @@ async function updateDashboard(trades) {
     if (stats.total) stats.total.textContent = total;
     if (stats.wins) stats.wins.textContent = wins;
     if (stats.losses) stats.losses.textContent = losses;
-    if (stats.winrate) stats.winrate.textContent = winrate;
-    if (stats.profit) stats.profit.textContent = totalProfit;
+    if (stats.winrate) stats.winrate.textContent = winrate + "%";
+    if (stats.profit) stats.profit.textContent = totalProfit.toLocaleString();
     if (stats.avgRR) stats.avgRR.textContent = avgRR;
 }
 
@@ -48,25 +49,32 @@ async function renderTrades() {
     const trades = await fetchTrades();
     tradesList.innerHTML = "";
 
-    trades.forEach((trade) => {
+    // Ma'lumotlarni teskari tartibda chiqarish (oxirgisi tepada)
+    [...trades].reverse().forEach((trade) => {
         const card = document.createElement("div");
         card.className = "trade-card";
         card.style.marginBottom = "15px";
 
+        const isWin = String(trade.natija).toLowerCase() === 'win';
+        const profitColor = parseFloat(trade.foyda) >= 0 ? '#00c805' : '#ff3b30';
+
         card.innerHTML = `
             <div class="trade-card-content">
                 <div class="trade-info-list">
-                    <div class="info-item"><i class="fa-regular fa-calendar"></i> ${trade.sana}</div>
-                    <div class="info-item"><b>${trade.aktiv}</b></div>
-                    <div class="info-item ${trade.natija === 'win' ? 'status-tp' : 'status-sl'}">
-                        <i class="fa-solid fa-bullseye"></i> ${trade.natija.toUpperCase()}
+                    <div class="info-item"><i class="fa-regular fa-calendar"></i> ${trade.sana || 'No date'}</div>
+                    <div class="info-item"><b>${trade.aktiv || '---'}</b></div>
+                    <div class="info-item ${isWin ? 'status-tp' : 'status-sl'}">
+                        <i class="fa-solid ${isWin ? 'fa-circle-check' : 'fa-circle-xmark'}"></i> 
+                        ${(trade.natija || '---').toUpperCase()}
                     </div>
-                    <div class="info-item profit-val" style="color: ${trade.foyda >= 0 ? '#00c805' : '#ff3b30'}">
-                        <i class="fa-solid fa-money-bill-1"></i> ${trade.foyda} USD
+                    <div class="info-item profit-val" style="color: ${profitColor}">
+                        <i class="fa-solid fa-money-bill-1"></i> ${trade.foyda || 0} USD
                     </div>
                 </div>
                 <div class="trade-actions">
-                    <button class="icon-btn delete" data-id="${trade._id}"><i class="fa-solid fa-trash-can"></i></button>
+                    <button class="icon-btn delete" data-id="${trade._id}">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
                 </div>
             </div>
         `;
@@ -77,7 +85,13 @@ async function renderTrades() {
 
 // 4. Telegramga yuborish
 async function sendToTelegram(data) {
-    const message = `📊 <b>Yangi Trade Saqlandi</b>\n──────────────────\n📅 <b>Sana:</b> ${data.sana}\n💱 <b>Aktiv:</b> ${data.aktiv}\n🎯 <b>Strategiya:</b> ${data.strategiya}\n📈 <b>Natija:</b> ${data.natija.toUpperCase()}\n💵 <b>Foyda:</b> ${data.foyda} USD\n──────────────────`;
+    const message = `📊 <b>Yangi Trade Saqlandi</b>\n` +
+        `──────────────────\n` +
+        `📅 <b>Sana:</b> ${data.sana}\n` +
+        `💱 <b>Aktiv:</b> ${data.aktiv}\n` +
+        `🎯 <b>Natija:</b> ${data.natija.toUpperCase()}\n` +
+        `💵 <b>Foyda:</b> ${data.foyda} USD\n` +
+        `──────────────────`;
     try {
         await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
             method: "POST",
@@ -87,41 +101,52 @@ async function sendToTelegram(data) {
     } catch (e) { console.error("Telegram Error:", e); }
 }
 
-// 5. Formani saqlash (Serverga + Telegramga)
-form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
+// 5. Formani saqlash
+if (form) {
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        // Input qiymatlarini olish
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
 
-    try {
-        const response = await fetch(API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-        });
+        try {
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
 
-        if (response.ok) {
-            await sendToTelegram(data);
-            await renderTrades();
-            form.reset();
+            if (response.ok) {
+                await sendToTelegram(data);
+                await renderTrades();
+                form.reset();
+            } else {
+                alert("Serverga saqlashda xato yuz berdi!");
+            }
+        } catch (e) {
+            console.error("Saqlashda xato:", e);
         }
-    } catch (e) {
-        console.error("Saqlashda xato:", e);
-    }
-});
+    });
+}
 
 // 6. O'chirish funksiyasi
-tradesList.addEventListener("click", async (e) => {
-    const btn = e.target.closest(".delete");
-    if (!btn) return;
+if (tradesList) {
+    tradesList.addEventListener("click", async (e) => {
+        const btn = e.target.closest(".delete");
+        if (!btn) return;
 
-    const id = btn.dataset.id;
-    if (confirm("O'chirilsinmi?")) {
-        try {
-            await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-            renderTrades();
-        } catch (e) { console.error("O'chirishda xato:", e); }
-    }
-});
+        const id = btn.dataset.id;
+        if (confirm("Ushbu savdo o'chirilsinmi?")) {
+            try {
+                const response = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+                if (response.ok) {
+                    await renderTrades();
+                }
+            } catch (e) { console.error("O'chirishda xato:", e); }
+        }
+    });
+}
 
+// Sahifa yuklanganda ishga tushirish
 document.addEventListener("DOMContentLoaded", renderTrades);

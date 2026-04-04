@@ -43,22 +43,12 @@ const Trade = mongoose.models.Trade || mongoose.model('Trade', tradeSchema);
 
 // 4. API Routes
 
+// Asosiy sahifa
 app.get('/', (req, res) => {
-    res.send('Trading Journal API ishlamoqda!');
+    res.send('Trading Journal API ishlamoqda! 🚀');
 });
 
-// Yangi savdo qo'shish (POST)
-app.post('/api/trades', async (req, res) => {
-    try {
-        const newTrade = new Trade(req.body);
-        const savedTrade = await newTrade.save();
-        res.status(201).json(savedTrade);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
-    }
-});
-
-// Hamma savdolarni olish (GET)
+// Hamma savdolarni olish
 app.get('/api/trades', async (req, res) => {
     try {
         const trades = await Trade.find().sort({ createdAt: -1 });
@@ -68,32 +58,45 @@ app.get('/api/trades', async (req, res) => {
     }
 });
 
-// --- YANGI: Savdoni tahrirlash (PUT) ---
+// Yangi savdo qo'shish
+app.post('/api/trades', async (req, res) => {
+    try {
+        const newTrade = new Trade(req.body);
+        const savedTrade = await newTrade.save();
+        res.status(201).json(savedTrade);
+    } catch (err) {
+        console.error("Saqlashda xato:", err);
+        res.status(400).json({ message: err.message });
+    }
+});
+
+// SAVDONI TAHRIRLASH (Boya app.js da startEdit uchun kerak edi)
 app.put('/api/trades/:id', async (req, res) => {
     try {
         const updatedTrade = await Trade.findByIdAndUpdate(
             req.params.id, 
             req.body, 
-            { new: true } // Yangilangan ma'lumotni qaytarish uchun
+            { new: true, runValidators: true }
         );
         if (!updatedTrade) return res.status(404).json({ message: "Savdo topilmadi" });
         res.json(updatedTrade);
     } catch (err) {
+        console.error("Yangilashda xato:", err);
         res.status(400).json({ message: err.message });
     }
 });
 
-// Savdoni o'chirish (DELETE)
+// Savdoni o'chirish
 app.delete('/api/trades/:id', async (req, res) => {
     try {
         const deletedTrade = await Trade.findByIdAndDelete(req.params.id);
         if (!deletedTrade) return res.status(404).json({ message: "Savdo topilmadi" });
-        res.json({ message: "Savdo o'chirildi" });
+        res.json({ message: "Savdo o'chirildi ✅" });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 });
 
-// 5. Serverni yondirish
-const PORT = process.env.PORT || 10000; // Render uchun 10000 porti yaxshiroq
+// Portni Render uchun moslash
+const PORT = process.env.PORT || 10000; 
 app.listen(PORT, () => console.log(`🚀 Server yondi: port ${PORT}`));

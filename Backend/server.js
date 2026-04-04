@@ -5,7 +5,7 @@ require('dotenv').config();
 
 const app = express();
 
-// 1. CORS Sozlamalari (To'liq ruxsat bilan)
+// 1. Middlewares
 app.use(cors());
 app.use(express.json());
 
@@ -14,7 +14,7 @@ mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('✅ MongoDB muvaffaqiyatli ulandi'))
     .catch(err => console.error('❌ MongoDB ulanishida xato:', err.message));
 
-// 3. Trade Schema (Mixed tipidan foydalanamiz, shunda ham son ham matn tushadi)
+// 3. Trade Schema
 const tradeSchema = new mongoose.Schema({
     sana: String,
     vaqt: String,
@@ -47,19 +47,18 @@ app.get('/', (req, res) => {
     res.send('Trading Journal API ishlamoqda!');
 });
 
-// Yangi savdo qo'shish
+// Yangi savdo qo'shish (POST)
 app.post('/api/trades', async (req, res) => {
     try {
         const newTrade = new Trade(req.body);
         const savedTrade = await newTrade.save();
         res.status(201).json(savedTrade);
     } catch (err) {
-        console.error("Saqlashda xato:", err);
         res.status(400).json({ message: err.message });
     }
 });
 
-// Hamma savdolarni olish
+// Hamma savdolarni olish (GET)
 app.get('/api/trades', async (req, res) => {
     try {
         const trades = await Trade.find().sort({ createdAt: -1 });
@@ -69,7 +68,22 @@ app.get('/api/trades', async (req, res) => {
     }
 });
 
-// Savdoni o'chirish
+// --- YANGI: Savdoni tahrirlash (PUT) ---
+app.put('/api/trades/:id', async (req, res) => {
+    try {
+        const updatedTrade = await Trade.findByIdAndUpdate(
+            req.params.id, 
+            req.body, 
+            { new: true } // Yangilangan ma'lumotni qaytarish uchun
+        );
+        if (!updatedTrade) return res.status(404).json({ message: "Savdo topilmadi" });
+        res.json(updatedTrade);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
+// Savdoni o'chirish (DELETE)
 app.delete('/api/trades/:id', async (req, res) => {
     try {
         const deletedTrade = await Trade.findByIdAndDelete(req.params.id);
@@ -80,5 +94,6 @@ app.delete('/api/trades/:id', async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server yondi: http://localhost:${PORT}`));
+// 5. Serverni yondirish
+const PORT = process.env.PORT || 10000; // Render uchun 10000 porti yaxshiroq
+app.listen(PORT, () => console.log(`🚀 Server yondi: port ${PORT}`));

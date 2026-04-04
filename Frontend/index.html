@@ -14,6 +14,27 @@
     />
     <link rel="stylesheet" href="./css/main.css" />
     <link rel="icon" type="image/png" href="./assets/logo/my-logo.jpg">
+    <style>
+      /* Loading Spinner uchun kichik CSS */
+      #loader {
+        display: none;
+        text-align: center;
+        padding: 20px;
+        font-weight: 600;
+        color: #007aff;
+      }
+      .search-box {
+        margin: 20px 0;
+        width: 100%;
+      }
+      #searchInput {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        font-family: 'Inter', sans-serif;
+      }
+    </style>
   </head>
   <body>
     <div class="container">
@@ -87,8 +108,8 @@
             <input type="number" step="any" name="tp" />
           </div>
           <div class="field">
-            <label><i class="fa-solid fa-scale-unbalanced"></i> RR</label>
-            <input type="text" name="rr" />
+            <label><i class="fa-solid fa-scale-unbalanced"></i> RR (Avto)</label>
+            <input type="text" name="rr" placeholder="1:2" readonly />
           </div>
           <div class="field">
             <label><i class="fa-solid fa-weight-hanging"></i> Lot</label>
@@ -136,10 +157,20 @@
             </div>
           </div>
         </div>
-        <button type="submit" class="submit-btn">
+        <button type="submit" class="submit-btn" id="submitBtn">
           Saqlash <i class="fa-solid fa-floppy-disk"></i>
         </button>
       </form>
+
+      <hr />
+
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Pair nomi (XAUUSD) yoki natija (Win/Loss) bo'yicha qidirish..." />
+      </div>
+
+      <div id="loader">
+        <i class="fa-solid fa-spinner fa-spin"></i> Ma'lumotlar yuklanmoqda...
+      </div>
 
       <div id="tradesList" class="trades-container"></div>
     </div>

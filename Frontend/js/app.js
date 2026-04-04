@@ -4,6 +4,11 @@ const API_URL = "https://tread-jurnal.onrender.com/api/trades";
 
 const form = document.querySelector("#tradeForm");
 const tradesList = document.querySelector("#tradesList");
+const searchInput = document.querySelector("#searchInput"); // HTML-ga <input id="searchInput"> qo'shing
+
+let allTrades = []; // Filter uchun barcha tradesni saqlaymiz
+let editMode = false;
+let editId = null;
 
 const stats = {
     total: document.getElementById("totalTrades"),
@@ -14,17 +19,48 @@ const stats = {
     avgRR: document.getElementById("avgRR")
 };
 
+// 1. Loading Spinner Funksiyasi
+function toggleLoading(show) {
+    const loader = document.getElementById("loader"); // HTML-ga <div id="loader"></div> qo'shing
+    if (loader) loader.style.display = show ? "block" : "none";
+}
+
+// 2. Auto-Calculate RR (Kirish, SL, TP o'zgarganda ishlaydi)
+const inputs = ['kirish', 'sl', 'tp'].map(name => document.getElementsByName(name)[0]);
+inputs.forEach(input => {
+    if (input) {
+        input.addEventListener('input', () => {
+            const entry = parseFloat(document.getElementsByName('kirish')[0].value);
+            const sl = parseFloat(document.getElementsByName('sl')[0].value);
+            const tp = parseFloat(document.getElementsByName('tp')[0].value);
+
+            if (entry && sl && tp) {
+                const risk = Math.abs(entry - sl);
+                const reward = Math.abs(tp - entry);
+                const rrValue = (reward / risk).toFixed(2);
+                document.getElementsByName('rr')[0].value = `1:${rrValue}`;
+            }
+        });
+    }
+});
+
+// 3. Ma'lumotlarni olish
 async function fetchTrades() {
+    toggleLoading(true);
     try {
         const response = await fetch(API_URL);
         if (!response.ok) throw new Error("Server xatosi");
-        return await response.json();
+        allTrades = await response.json();
+        return allTrades;
     } catch (e) {
         console.error("Xatolik:", e);
         return [];
+    } finally {
+        toggleLoading(false);
     }
 }
 
+// 4. Dashboardni yangilash
 function updateDashboard(trades) {
     const total = trades.length;
     const wins = trades.filter(t => String(t.natija).toLowerCase() === "win").length;
@@ -45,9 +81,10 @@ function updateDashboard(trades) {
     if (stats.avgRR) stats.avgRR.textContent = avgRR;
 }
 
-async function renderTrades() {
+// 5. Render va Filter (Qidiruv)
+async function renderTrades(tradesToRender = null) {
     if (!tradesList) return;
-    const trades = await fetchTrades();
+    const trades = tradesToRender || await fetchTrades();
     tradesList.innerHTML = "";
 
     trades.forEach((trade) => {
@@ -66,10 +103,13 @@ async function renderTrades() {
                         ${(trade.natija || '---').toUpperCase()}
                     </div>
                     <div class="info-item profit-val" style="color: ${profitColor}">
-                        <i class="fa-solid fa-money-bill-1"></i> ${trade.foyda || 0} USD
+                        $${trade.foyda || 0}
                     </div>
                 </div>
                 <div class="trade-actions">
+                    <button class="icon-btn edit" onclick="startEdit('${trade._id}')">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </button>
                     <button class="icon-btn delete" data-id="${trade._id}">
                         <i class="fa-solid fa-trash-can"></i>
                     </button>
@@ -81,53 +121,70 @@ async function renderTrades() {
     updateDashboard(trades);
 }
 
-async function sendToTelegram(data) {
-    const message = `📊 <b>Yangi Trade Saqlandi</b>\n` +
-        `──────────────────\n` +
-        `📅 <b>Sana:</b> ${data.sana}\n` +
-        `💱 <b>Aktiv:</b> ${data.aktiv}\n` +
-        `🎯 <b>Natija:</b> ${data.natija.toUpperCase()}\n` +
-        `💵 <b>Foyda:</b> ${data.foyda} USD\n` +
-        `──────────────────`;
-    try {
-        await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ chat_id: CHAT_ID, text: message, parse_mode: "HTML" })
-        });
-    } catch (e) { console.error("Telegram Error:", e); }
+// 6. Filter (Search) funksiyasi
+if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        const filtered = allTrades.filter(t => 
+            t.aktiv.toLowerCase().includes(term) || 
+            t.natija.toLowerCase().includes(term)
+        );
+        renderTrades(filtered);
+    });
 }
 
+// 7. Tahrirlashni boshlash (Formani to'ldirish)
+window.startEdit = function(id) {
+    const trade = allTrades.find(t => t._id === id);
+    if (!trade) return;
+
+    editMode = true;
+    editId = id;
+
+    // Formani to'ldirish
+    Object.keys(trade).forEach(key => {
+        const input = form.elements[key];
+        if (input) input.value = trade[key];
+    });
+
+    form.querySelector("button[type='submit']").textContent = "Yangilash";
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+// 8. Formani saqlash (POST yoki PUT)
 if (form) {
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
-
-        // Raqamlarni tekshirib yuboramiz
         data.foyda = Number(data.foyda) || 0;
 
+        const method = editMode ? "PUT" : "POST";
+        const url = editMode ? `${API_URL}/${editId}` : API_URL;
+
         try {
-            const response = await fetch(API_URL, {
-                method: "POST",
+            const response = await fetch(url, {
+                method: method,
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data)
             });
 
             if (response.ok) {
-                await sendToTelegram(data);
-                await renderTrades();
+                if (!editMode) await sendToTelegram(data);
+                editMode = false;
+                editId = null;
                 form.reset();
-                alert("Muvaffaqiyatli saqlandi!");
-            } else {
-                alert("Xato: Server ma'lumotni qabul qilmadi.");
+                form.querySelector("button[type='submit']").textContent = "Saqlash";
+                await renderTrades();
+                alert("Muvaffaqiyatli amalga oshirildi!");
             }
         } catch (e) {
-            alert("Aloqa uzildi!");
+            alert("Xatolik yuz berdi!");
         }
     });
 }
 
+// 9. O'chirish
 if (tradesList) {
     tradesList.addEventListener("click", async (e) => {
         const btn = e.target.closest(".delete");

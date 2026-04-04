@@ -4,12 +4,15 @@
     --field-bg: #1e232d;
     --border: #2a2e39;
     --accent: #2962ff;
+    --accent-hover: #1e4bd8;
     --success: #00c805;
     --danger: #ff3b30;
     --text: #d1d4dc;
     --text-white: #ffffff;
+    --edit-glow: rgba(41, 98, 255, 0.2);
 }
 
+/* Umumiy sozlamalar */
 * {
     margin: 0;
     padding: 0;
@@ -35,13 +38,13 @@ body {
     margin-bottom: 40px;
 }
 
-h1 { color: var(--text-white); font-size: 2.5rem; }
+h1 { color: var(--text-white); font-size: 2.5rem; margin-bottom: 10px; }
 .welcome-text span { color: var(--accent); font-weight: 700; }
 
 /* Dashboard */
 .dashboard {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 15px;
     margin-bottom: 40px;
 }
@@ -52,10 +55,45 @@ h1 { color: var(--text-white); font-size: 2.5rem; }
     padding: 20px;
     border-radius: 12px;
     text-align: center;
-    font-weight: 600;
+    transition: transform 0.2s;
 }
 
-.dashboard .card i { display: block; margin-bottom: 8px; font-size: 1.2rem; color: var(--accent); }
+.dashboard .card:hover { transform: translateY(-5px); }
+.dashboard .card i { display: block; margin-bottom: 8px; font-size: 1.4rem; color: var(--accent); }
+.dashboard .card.win i { color: var(--success); }
+.dashboard .card.loss i { color: var(--danger); }
+
+/* Qidiruv tizimi (Search Box) */
+.search-box {
+    margin-bottom: 30px;
+    position: relative;
+}
+
+#searchInput {
+    width: 100%;
+    padding: 15px 20px;
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    color: var(--text-white);
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+#searchInput:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 15px rgba(41, 98, 255, 0.1);
+}
+
+/* Loading Spinner */
+#loader {
+    display: none;
+    text-align: center;
+    padding: 30px;
+    font-size: 1.1rem;
+    color: var(--accent);
+}
 
 /* Form */
 .form {
@@ -64,11 +102,18 @@ h1 { color: var(--text-white); font-size: 2.5rem; }
     border-radius: 16px;
     border: 1px solid var(--border);
     margin-bottom: 50px;
+    transition: all 0.4s ease;
+}
+
+/* Tahrirlash rejimi yonganda formaga ko'k chiziq va soya beradi */
+.form.edit-active {
+    border-color: var(--accent);
+    box-shadow: 0 0 25px var(--edit-glow);
 }
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
 }
 
@@ -86,128 +131,125 @@ input, textarea, select {
     color: var(--text-white);
     outline: none;
     transition: 0.2s;
+    font-size: 0.95rem;
 }
 
-input:focus, textarea:focus { border-color: var(--accent); }
+input:focus, textarea:focus, select:focus { 
+    border-color: var(--accent); 
+    background: #242a36;
+}
+
+/* Maxsus: Readonly RR maydoni */
+input[name="rr"] {
+    background: rgba(41, 98, 255, 0.05);
+    color: var(--accent);
+    font-weight: 700;
+    cursor: not-allowed;
+}
 
 .textarea-group {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 10px;
+    gap: 15px;
 }
 
 .submit-btn {
     margin-top: 30px;
     width: 100%;
-    padding: 15px;
+    padding: 16px;
     background: var(--accent);
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     font-weight: 700;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    transition: all 0.3s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
 }
 
+.submit-btn:hover { background: var(--accent-hover); transform: translateY(-2px); }
+
 /* Trade Cards */
+.trades-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
 .trade-card {
     background: var(--card-bg);
     border: 1px solid var(--border);
-    padding: 15px 25px;
-    border-radius: 10px;
-    margin-bottom: 12px;
+    padding: 20px;
+    border-radius: 12px;
+    transition: all 0.3s;
 }
 
-.trade-card-header {
+.trade-card:hover { border-color: #404656; }
+
+.trade-card-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.trade-main-info {
-    display: flex;
-    align-items: center;
-    gap: 25px;
-    flex-wrap: wrap;
-}
-
-.trade-symbol { font-weight: 700; color: var(--text-white); font-size: 1.1rem; }
-.trade-result.win { color: var(--success); }
-.trade-profit { font-weight: 600; color: var(--success); }
-
-.trade-actions { display: flex; gap: 10px; }
-
-.icon-btn {
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.icon-btn.edit { color: #848e9c; }
-.icon-btn.edit:hover { color: var(--accent); }
-.icon-btn.delete { color: #848e9c; }
-.icon-btn.delete:hover { color: var(--danger); }
-.card.loss i {
-    color: #ff3b30; /* Qizil rang */
-}
-.trade-card-content {
-    display: flex;
-    justify-content: space-between; /* Ma'lumotlar chapda, tugmalar o'ngda */
-    align-items: flex-start; /* Tugmalar tepadan tekislanadi */
-    padding: 15px;
-    background: #151921;
-    border-radius: 10px;
-    border: 1px solid #2a2e39;
-}
-
 .trade-info-list {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    flex-wrap: wrap;
+    gap: 25px;
+    align-items: center;
 }
 
 .info-item {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 0.9rem;
-    color: #d1d4dc;
+    font-size: 1rem;
 }
 
-.info-item i {
-    width: 16px;
-    color: #848e9c;
-}
+.info-item b { color: var(--text-white); font-size: 1.1rem; }
+.info-item i { color: #848e9c; width: 18px; text-align: center; }
 
-/* Icon tugmalar stili */
+/* Status ranglari */
+.status-tp { color: var(--success); font-weight: 700; }
+.status-sl { color: var(--danger); font-weight: 700; }
+.profit-val { font-weight: 800; font-size: 1.1rem; }
+
+/* Harakat tugmalari */
 .trade-actions {
     display: flex;
-    gap: 12px;
+    gap: 15px;
 }
 
 .icon-btn {
-    background: none;
-    border: none;
+    background: var(--field-bg);
+    border: 1px solid var(--border);
     cursor: pointer;
     font-size: 1.1rem;
-    padding: 5px;
-    transition: all 0.2s ease;
-    color: #848e9c; /* Standart rang */
+    padding: 10px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    color: #848e9c;
 }
 
-/* Hover effekti */
 .icon-btn.edit:hover {
-    color: #2962ff; /* Ko'k */
-    transform: scale(1.1);
+    color: var(--accent);
+    background: rgba(41, 98, 255, 0.1);
+    border-color: var(--accent);
 }
 
 .icon-btn.delete:hover {
-    color: #ff3b30; /* Qizil */
-    transform: scale(1.1);
+    color: var(--danger);
+    background: rgba(255, 59, 48, 0.1);
+    border-color: var(--danger);
 }
 
-/* Status ranglari */
-.status-tp { color: #00c805; font-weight: 600; }
-.profit-val { color: #00c805; }
+/* Responsivlik */
+@media (max-width: 768px) {
+    .trade-card-content { flex-direction: column; align-items: flex-start; gap: 20px; }
+    .trade-actions { width: 100%; justify-content: flex-end; }
+    .trade-info-list { gap: 15px; }
+}

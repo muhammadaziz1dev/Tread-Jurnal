@@ -1,6 +1,6 @@
 const TOKEN = "8739866680:AAFwClNNNtv9Cgs36K5fHA_sz6LrtZvb3mQ";
 const CHAT_ID = "8101060085";
-const API_URL = "http://localhost:5000/api/trades";
+const API_URL = "https://tread-jurnal.onrender.com/api/trades";
 
 const form = document.querySelector("#tradeForm");
 const tradesList = document.querySelector("#tradesList");

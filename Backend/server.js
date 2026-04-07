@@ -7,96 +7,25 @@ const app = express();
 
 // 1. Middlewares
 app.use(cors());
-app.use(express.json());
+app.use(express.json()); // Kelayotgan JSON ma'lumotlarni o'qish uchun shart!
 
 // 2. MongoDB ulanish
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('✅ MongoDB muvaffaqiyatli ulandi'))
     .catch(err => console.error('❌ MongoDB ulanishida xato:', err.message));
 
-// 3. Trade Schema
-const tradeSchema = new mongoose.Schema({
-    sana: String,
-    vaqt: String,
-    aktiv: String,
-    strategiya: String,
-    trend: String,
-    balans: mongoose.Schema.Types.Mixed,
-    kirish: mongoose.Schema.Types.Mixed,
-    sl: mongoose.Schema.Types.Mixed,
-    tp: mongoose.Schema.Types.Mixed,
-    rr: mongoose.Schema.Types.Mixed,
-    lot: mongoose.Schema.Types.Mixed,
-    natija: String,
-    foyda: mongoose.Schema.Types.Mixed,
-    risk: mongoose.Schema.Types.Mixed,
-    davom: String,
-    sabab: String,
-    oldHiss: String,
-    jarayonHiss: String,
-    yakunHiss: String,
-    xato: String,
-    togri: String
-}, { timestamps: true });
+// 3. API Routes (Yo'nalishlarni ulash)
+// Auth (Login/Register) yo'nalishi
+app.use('/api/auth', require('./routes/auth'));
 
-const Trade = mongoose.models.Trade || mongoose.model('Trade', tradeSchema);
+// Trades (Savdolar) yo'nalishi
+app.use('/api/trades', require('./routes/trades'));
 
-// 4. API Routes
-
-// Asosiy sahifa
+// Asosiy sahifa testi
 app.get('/', (req, res) => {
     res.send('Trading Journal API ishlamoqda! 🚀');
 });
 
-// Hamma savdolarni olish
-app.get('/api/trades', async (req, res) => {
-    try {
-        const trades = await Trade.find().sort({ createdAt: -1 });
-        res.json(trades);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-
-// Yangi savdo qo'shish
-app.post('/api/trades', async (req, res) => {
-    try {
-        const newTrade = new Trade(req.body);
-        const savedTrade = await newTrade.save();
-        res.status(201).json(savedTrade);
-    } catch (err) {
-        console.error("Saqlashda xato:", err);
-        res.status(400).json({ message: err.message });
-    }
-});
-
-// SAVDONI TAHRIRLASH (Boya app.js da startEdit uchun kerak edi)
-app.put('/api/trades/:id', async (req, res) => {
-    try {
-        const updatedTrade = await Trade.findByIdAndUpdate(
-            req.params.id, 
-            req.body, 
-            { new: true, runValidators: true }
-        );
-        if (!updatedTrade) return res.status(404).json({ message: "Savdo topilmadi" });
-        res.json(updatedTrade);
-    } catch (err) {
-        console.error("Yangilashda xato:", err);
-        res.status(400).json({ message: err.message });
-    }
-});
-
-// Savdoni o'chirish
-app.delete('/api/trades/:id', async (req, res) => {
-    try {
-        const deletedTrade = await Trade.findByIdAndDelete(req.params.id);
-        if (!deletedTrade) return res.status(404).json({ message: "Savdo topilmadi" });
-        res.json({ message: "Savdo o'chirildi ✅" });
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-
-// Portni Render uchun moslash
+// 4. Port sozlamasi (Render uchun)
 const PORT = process.env.PORT || 10000; 
 app.listen(PORT, () => console.log(`🚀 Server yondi: port ${PORT}`));

@@ -24,12 +24,12 @@
         </p>
     </div>
 
-    <script>
-    document.getElementById('regForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const data = Object.fromEntries(new FormData(e.target));
-        
-        // DIQQAT: /api/trades EMAS, /api/auth/register BO'LISHI KERAK
+<script>
+document.getElementById('regForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target));
+    
+    try {
         const res = await fetch('https://tread-jurnal.onrender.com/api/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -43,23 +43,9 @@
             const err = await res.json(); 
             alert(err.message || "Xatolik yuz berdi"); 
         }
-    });
-    const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: email, // Ro'yxatdan o'tayotgan odamning emaili
-    subject: 'Trading Journal-ga xush kelibsiz!',
-    html: `
-        <div style="font-family: sans-serif; padding: 20px; border: 1px solid #2962ff; border-radius: 10px;">
-            <h2 style="color: #2962ff;">Tabriklaymiz!</h2>
-            <p>Siz muvaffaqiyatli ro'yxatdan o'tdingiz. Endi o'z savdolaringizni nazorat qilishingiz mumkin.</p>
-            <p><b>Login:</b> ${email}</p>
-        </div>
-    `
-};
-
-transporter.sendMail(mailOptions, (error, info) => {
-    if (error) console.log("Email xatosi:", error);
-    else console.log("Email yuborildi: " + info.response);
+    } catch (err) {
+        alert("Server bilan aloqa uzildi. Render Logs bo'limini tekshiring.");
+    }
 });
 </script>
 </body>

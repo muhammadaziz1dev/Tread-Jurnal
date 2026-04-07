@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="uz">
   <head>
     <meta charset="UTF-8" />
@@ -13,166 +13,368 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <link rel="stylesheet" href="./css/main.css" />
-    <link rel="icon" type="image/png" href="./assets/logo/my-logo-2.jpg">
+    <link rel="icon" type="image/png" href="./assets/logo/logo-3.jpg" />
   </head>
   <body>
-    <div class="container">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <p class="welcome-text" style="margin: 0;">Xush kelibsiz, <span id="userNameDisplay">Muhammadaziz</span></p>
-        <button onclick="logout()" class="icon-btn delete" style="padding: 8px 15px; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;">
+    <header class="mobile-only-navbar">
+      <div class="m-nav-container">
+        <div class="m-logo">
+          <img src="./assets/logo/logo-3.jpg" alt="logo" />
+          <span>Trading Journal</span>
+        </div>
+        <button id="mobileMenuBtn" class="m-burger">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+
+      <nav class="m-dropdown-menu" id="mobileDropdown">
+        <a href="#" class="nav-link active" onclick="showSection('dashboard')"
+          ><i class="fa-solid fa-house"></i> Dashboard</a
+        >
+        <a href="#" class="nav-link" onclick="showSection('analytics')"
+          ><i class="fa-solid fa-chart-pie"></i> Analizlar</a
+        >
+        <a href="#" class="nav-link" onclick="showSection('calculator')"
+          ><i class="fa-solid fa-calculator"></i> Risk Calc</a
+        >
+        <a href="#" class="nav-link" onclick="showSection('ai-mentor')"
+          ><i class="fa-solid fa-brain"></i> AI Mentor</a
+        >
+        <a href="#" class="nav-link"
+          ><i class="fa-brands fa-telegram"></i> Telegram Bot</a
+        >
+        <a href="#" class="nav-link"
+          ><i class="fa-solid fa-gears"></i> Sozlamalar</a
+        >
+        <button onclick="logout()" class="m-logout-link">
+          <i class="fa-solid fa-right-from-bracket"></i> Chiqish
+        </button>
+      </nav>
+    </header>
+
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="profile-img">
+          <img
+            src="./assets/logo/logo-3.jpg"
+            alt="eror"
+            class="profile-img-rasm"
+          />
+        </div>
+        <div class="profile-info">
+          <span id="userNameDisplay">Muhammadaziz</span>
+          <small>Premium Trader Journal</small>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-link active" onclick="showSection('dashboard')"
+          ><i class="fa-solid fa-house"></i> Dashboard</a
+        >
+        <a href="#" class="nav-link" onclick="showSection('analytics')"
+          ><i class="fa-solid fa-chart-pie"></i> Analizlar</a
+        >
+        <a href="#" class="nav-link" onclick="showSection('calculator')"
+          ><i class="fa-solid fa-calculator"></i> Risk Calc</a
+        >
+        <a href="#" class="nav-link" onclick="showSection('ai-mentor')"
+          ><i class="fa-solid fa-brain"></i> AI Mentor</a
+        >
+        <a href="#" class="nav-link"
+          ><i class="fa-brands fa-telegram"></i> Telegram Bot</a
+        >
+        <a href="#" class="nav-link"
+          ><i class="fa-solid fa-gears"></i> Sozlamalar</a
+        >
+      </nav>
+
+      <div class="sidebar-watchlist">
+        <p class="watchlist-title">Market Live</p>
+        <div class="watchlist-item">
+          <span class="pair">XAUUSD</span>
+          <span class="price up">2345.20</span>
+        </div>
+        <div class="watchlist-item">
+          <span class="pair">BTCUSD</span>
+          <span class="price down">67450.0</span>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <button onclick="logout()" class="logout-btn">
           <i class="fa-solid fa-right-from-bracket"></i> Chiqish
         </button>
       </div>
+    </aside>
 
-      <header class="main-header">
-        <h1>Trading Journal</h1>
-      </header>
+    <main class="main-content">
+      <div class="container">
+        <section id="dashboardSection">
+          <header class="main-header">
+            <h1>Trading Journal</h1>
+            <p class="welcome-text">
+              Professional savdo tahlillari platformasi
+            </p>
+          </header>
 
-      <div class="dashboard">
-        <div class="card">
-          <i class="fa-solid fa-layer-group"></i> Total:
-          <span id="totalTrades">0</span>
-        </div>
-        <div class="card win">
-          <i class="fa-solid fa-chart-line"></i> Wins: <span id="wins">0</span>
-        </div>
-        <div class="card loss">
-          <i class="fa-solid fa-arrow-trend-down"></i> Losses:
-          <span id="losses">0</span>
-        </div>
-        <div class="card rate">
-          <i class="fa-solid fa-percentage"></i> Winrate:
-          <span id="winrate">0</span>%
-        </div>
-        <div class="card profit">
-          <i class="fa-solid fa-wallet"></i> Profit:
-          <span id="totalProfit">0</span> USD
-        </div>
-        <div class="card rr">
-          <i class="fa-solid fa-scale-balanced"></i> Avg RR:
-          <span id="avgRR">0</span>
-        </div>
-      </div>
-
-      <form id="tradeForm" class="form">
-        <div class="grid">
-          <div class="field">
-            <label><i class="fa-regular fa-calendar"></i> Sana</label>
-            <input type="date" name="sana" required />
-          </div>
-          <div class="field">
-            <label><i class="fa-regular fa-clock"></i> Vaqt</label>
-            <input type="time" name="vaqt" />
-          </div>
-          <div class="field">
-            <label><i class="fa-solid fa-coins"></i> Aktiv</label>
-            <input type="text" name="aktiv" placeholder="Masalan: XAUUSD" required />
-          </div>
-          <div class="field">
-            <label><i class="fa-solid fa-wand-magic-sparkles"></i> Strategiya</label>
-            <input type="text" name="strategiya" />
-          </div>
-          <div class="field">
-            <label><i class="fa-solid fa-arrow-trend-up"></i> Trend</label>
-            <input type="text" name="trend" />
-          </div>
-          <div class="field">
-            <label><i class="fa-solid fa-vault"></i> Balans</label>
-            <input type="number" step="any" name="balans" />
-          </div>
-          <div class="field">
-            <label><i class="fa-solid fa-right-to-bracket"></i> Kirish</label>
-            <input type="number" step="any" name="kirish" />
-          </div>
-          <div class="field">
-            <label><i class="fa-solid fa-shield-halved"></i> SL</label>
-            <input type="number" step="any" name="sl" />
-          </div>
-          <div class="field">
-            <label><i class="fa-solid fa-bullseye"></i> TP</label>
-            <input type="number" step="any" name="tp" />
-          </div>
-          <div class="field">
-            <label><i class="fa-solid fa-scale-unbalanced"></i> RR (Avto)</label>
-            <input type="text" name="rr" placeholder="1:2" readonly />
-          </div>
-          <div class="field">
-            <label><i class="fa-solid fa-weight-hanging"></i> Lot</label>
-            <input type="number" step="any" name="lot" />
-          </div>
-          <div class="field">
-            <label><i class="fa-solid fa-flag-checkered"></i> Natija</label>
-            <select name="natija">
-              <option value="win">Win</option>
-              <option value="loss">Loss</option>
-            </select>
-          </div>
-          <div class="field">
-            <label><i class="fa-solid fa-dollar-sign"></i> Foyda</label>
-            <input type="number" step="any" name="foyda" required />
-          </div>
-          <div class="field">
-            <label><i class="fa-solid fa-triangle-exclamation"></i> Risk %</label>
-            <input type="number" step="any" name="risk" />
-          </div>
-          <div class="field">
-            <label><i class="fa-solid fa-hourglass-half"></i> Davomiyligi</label>
-            <input type="text" name="davom" />
-          </div>
-
-          <div class="field full">
-            <label><i class="fa-solid fa-comment-dots"></i> Kirish sababi</label>
-            <textarea name="sabab"></textarea>
-          </div>
-
-          <div class="field full">
-            <label><i class="fa-solid fa-brain"></i> Hissiyotlar (Oldin / Jarayon / Yakun)</label>
-            <div class="textarea-group">
-              <textarea name="oldHiss" placeholder="Oldin..."></textarea>
-              <textarea name="jarayonHiss" placeholder="Jarayon..."></textarea>
-              <textarea name="yakunHiss" placeholder="Yakun..."></textarea>
+          <div class="dashboard">
+            <div class="card">
+              <i class="fa-solid fa-layer-group"></i> Total:
+              <span id="totalTrades">0</span>
+            </div>
+            <div class="card win">
+              <i class="fa-solid fa-chart-line"></i> Wins:
+              <span id="wins">0</span>
+            </div>
+            <div class="card loss">
+              <i class="fa-solid fa-arrow-trend-down"></i> Losses:<span
+                id="losses"
+                >0</span
+              >
+            </div>
+            <div class="card rate">
+              <i class="fa-solid fa-percentage"></i> Winrate:
+              <span id="winrate">0</span>%
+            </div>
+            <div class="card profit">
+              <i class="fa-solid fa-wallet"></i> Profit:
+              <span id="totalProfit">0</span> USD
+            </div>
+            <div class="card rr">
+              <i class="fa-solid fa-scale-balanced"></i> Avg RR:
+              <span id="avgRR">0</span>
             </div>
           </div>
 
-          <div class="field full">
-            <label><i class="fa-solid fa-circle-xmark"></i> Xatolar va To'g'ri ishlar</label>
-            <div class="textarea-group">
-              <textarea name="xato" placeholder="Xatolar..."></textarea>
-              <textarea name="togri" placeholder="To'g'ri ishlar..."></textarea>
+          <form id="tradeForm" class="form">
+            <div class="grid">
+              <div class="field">
+                <label><i class="fa-regular fa-calendar"></i> Sana</label>
+                <input type="date" name="sana" required />
+              </div>
+              <div class="field">
+                <label><i class="fa-regular fa-clock"></i> Vaqt</label>
+                <input type="time" name="vaqt" />
+              </div>
+              <div class="field">
+                <label><i class="fa-solid fa-coins"></i> Aktiv</label>
+                <input
+                  type="text"
+                  name="aktiv"
+                  placeholder="Masalan: XAUUSD"
+                  required
+                />
+              </div>
+              <div class="field">
+                <label
+                  ><i class="fa-solid fa-wand-magic-sparkles"></i>
+                  Strategiya</label
+                >
+                <input type="text" name="strategiya" />
+              </div>
+              <div class="field">
+                <label><i class="fa-solid fa-arrow-trend-up"></i> Trend</label>
+                <input type="text" name="trend" />
+              </div>
+              <div class="field">
+                <label><i class="fa-solid fa-vault"></i> Balans</label>
+                <input type="number" step="any" name="balans" />
+              </div>
+              <div class="field">
+                <label
+                  ><i class="fa-solid fa-right-to-bracket"></i> Kirish</label
+                >
+                <input type="number" step="any" name="kirish" />
+              </div>
+              <div class="field">
+                <label><i class="fa-solid fa-shield-halved"></i> SL</label>
+                <input type="number" step="any" name="sl" />
+              </div>
+              <div class="field">
+                <label><i class="fa-solid fa-bullseye"></i> TP</label>
+                <input type="number" step="any" name="tp" />
+              </div>
+              <div class="field">
+                <label
+                  ><i class="fa-solid fa-scale-unbalanced"></i> RR (Avto)</label
+                >
+                <input type="text" name="rr" placeholder="1:2" readonly />
+              </div>
+              <div class="field">
+                <label><i class="fa-solid fa-weight-hanging"></i> Lot</label>
+                <input type="number" step="any" name="lot" />
+              </div>
+              <div class="field">
+                <label><i class="fa-solid fa-flag-checkered"></i> Natija</label>
+                <select name="natija">
+                  <option value="win">Win</option>
+                  <option value="loss">Loss</option>
+                </select>
+              </div>
+              <div class="field">
+                <label><i class="fa-solid fa-dollar-sign"></i> Foyda</label>
+                <input type="number" step="any" name="foyda" required />
+              </div>
+              <div class="field">
+                <label
+                  ><i class="fa-solid fa-triangle-exclamation"></i> Risk
+                  %</label
+                >
+                <input type="number" step="any" name="risk" />
+              </div>
+              <div class="field">
+                <label
+                  ><i class="fa-solid fa-hourglass-half"></i> Davomiyligi</label
+                >
+                <input type="text" name="davom" />
+              </div>
+
+              <div class="field full">
+                <label
+                  ><i class="fa-solid fa-comment-dots"></i> Kirish sababi</label
+                >
+                <textarea name="sabab" rows="3"></textarea>
+              </div>
+
+              <div class="field full">
+                <label
+                  ><i class="fa-solid fa-brain"></i> Hissiyotlar (Oldin /
+                  Jarayon / Yakun)</label
+                >
+                <div class="textarea-group">
+                  <textarea name="oldHiss" placeholder="Oldin..."></textarea>
+                  <textarea
+                    name="jarayonHiss"
+                    placeholder="Jarayon..."
+                  ></textarea>
+                  <textarea name="yakunHiss" placeholder="Yakun..."></textarea>
+                </div>
+              </div>
+
+              <div class="field full">
+                <label
+                  ><i class="fa-solid fa-circle-xmark"></i> Xatolar va To'g'ri
+                  ishlar</label
+                >
+                <div class="textarea-group">
+                  <textarea name="xato" placeholder="Xatolar..."></textarea>
+                  <textarea
+                    name="togri"
+                    placeholder="To'g'ri ishlar..."
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+            <button type="submit" class="submit-btn" id="submitBtn">
+              Saqlash <i class="fa-solid fa-floppy-disk"></i>
+            </button>
+          </form>
+
+          <hr
+            style="
+              border: 0;
+              border-top: 1px solid var(--border);
+              margin: 40px 0;
+            "
+          />
+
+          <div class="search-box">
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Para nomi (XAUUSD) yoki natija (Win/Loss) bo'yicha qidirish..."
+            />
+          </div>
+
+          <div id="loader">
+            <i class="fa-solid fa-spinner fa-spin"></i> Ma'lumotlar
+            yuklanmoqda...
+          </div>
+
+          <div id="tradesList" class="trades-container"></div>
+        </section>
+
+        <section id="analyticsSection" style="display: none">
+          <header class="main-header">
+            <h1>Savdo Analitikasi</h1>
+            <p class="welcome-text">
+              Sizning savdo natijalaringiz vizual ko'rinishda
+            </p>
+          </header>
+          <div class="analytics-chart-box">
+            <p>
+              <i class="fa-solid fa-chart-line"></i> Grafiklar tez kunda
+              Chart.js orqali ulanadi...
+            </p>
+          </div>
+        </section>
+
+        <section id="calculatorSection" style="display: none">
+          <header class="main-header">
+            <h1>Risk Kalkulyatori</h1>
+            <p class="welcome-text">Lot o'lchamini to'g'ri hisoblang</p>
+          </header>
+          <div class="form">
+            <div class="grid">
+              <div class="field">
+                <label>Balans ($)</label
+                ><input type="number" placeholder="1000" />
+              </div>
+              <div class="field">
+                <label>Risk (%)</label><input type="number" placeholder="1" />
+              </div>
+              <div class="field">
+                <label>Stop Loss (Pips)</label
+                ><input type="number" placeholder="20" />
+              </div>
+              <div class="field">
+                <label>Lot (Natija)</label
+                ><input type="text" readonly value="0.05" />
+              </div>
             </div>
           </div>
-        </div>
-        <button type="submit" class="submit-btn" id="submitBtn">
-          Saqlash <i class="fa-solid fa-floppy-disk"></i>
-        </button>
-      </form>
-
-      <hr style="border: 0; border-top: 1px solid var(--border); margin: 40px 0;" />
-
-      <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Pair nomi (XAUUSD) yoki natija (Win/Loss) bo'yicha qidirish..." />
+        </section>
       </div>
-
-      <div id="loader">
-        <i class="fa-solid fa-spinner fa-spin"></i> Ma'lumotlar yuklanmoqda...
-      </div>
-
-      <div id="tradesList" class="trades-container"></div>
-    </div>
+    </main>
 
     <script src="./js/app.js"></script>
     <script>
-      // Kirgan foydalanuvchi ismini ko'rsatish
-      const userEmail = localStorage.getItem('userEmail');
+      // Foydalanuvchi ismini ko'rsatish
+      const userEmail = localStorage.getItem("userEmail");
       if (userEmail) {
-          document.getElementById('userNameDisplay').textContent = userEmail.split('@')[0];
+        document.getElementById("userNameDisplay").textContent =
+          userEmail.split("@")[0];
       }
 
-      // Logout funksiyasi
+      // Bo'limlarni almashtirish funksiyasi
+      function showSection(section) {
+        // Hamma sectionlarni yashirish
+        document.getElementById("dashboardSection").style.display = "none";
+        document.getElementById("analyticsSection").style.display = "none";
+        document.getElementById("calculatorSection").style.display = "none";
+
+        // Navigatsiya linklaridan 'active' klassini olib tashlash
+        document
+          .querySelectorAll(".nav-link")
+          .forEach((link) => link.classList.remove("active"));
+
+        // Tanlangan sectionni ko'rsatish
+        if (section === "dashboard") {
+          document.getElementById("dashboardSection").style.display = "block";
+          event.currentTarget.classList.add("active");
+        } else if (section === "analytics") {
+          document.getElementById("analyticsSection").style.display = "block";
+          event.currentTarget.classList.add("active");
+        } else if (section === "calculator") {
+          document.getElementById("calculatorSection").style.display = "block";
+          event.currentTarget.classList.add("active");
+        }
+      }
+
       function logout() {
-          localStorage.removeItem('token');
-          localStorage.removeItem('userEmail');
-          window.location.href = 'login.html';
+        localStorage.removeItem("token");
+        localStorage.removeItem("userEmail");
+        window.location.href = "login.html";
       }
     </script>
   </body>

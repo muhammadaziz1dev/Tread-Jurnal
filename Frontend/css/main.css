@@ -10,6 +10,8 @@
     --text: #d1d4dc;
     --text-white: #ffffff;
     --edit-glow: rgba(41, 98, 255, 0.2);
+    --sidebar-width: 280px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Umumiy sozlamalar */
@@ -20,31 +22,155 @@
     font-family: 'Inter', sans-serif;
 }
 
+/* Skrollbarni chiroyli qilish */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
 body {
     background-color: var(--bg);
     color: var(--text);
-    padding: 40px 20px;
-    line-height: 1.6;
+    display: flex;
+    min-height: 100vh;
+}
+
+/* SIDEBAR STYLE */
+.sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    background: var(--card-bg);
+    border-right: 1px solid var(--border);
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    transition: var(--transition);
+}
+
+.sidebar-header {
+    padding: 30px 20px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+}
+
+.profile-img-rasm {
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+    object-fit: cover;
+    border: 2px solid var(--border);
+    margin-bottom: 10px;
+}
+
+.profile-info span {
+    display: block;
+    font-weight: 700;
+    color: var(--text-white);
+    font-size: 1.1rem;
+}
+
+.profile-info small {
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: 20px 10px;
+    overflow-y: auto;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    color: var(--text);
+    text-decoration: none;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.nav-link:hover, .nav-link.active {
+    background: var(--field-bg);
+    color: var(--text-white);
+}
+
+.nav-link.active {
+    border-left: 4px solid var(--accent);
+    background: rgba(41, 98, 255, 0.05);
+}
+
+/* Watchlist (Sidebar ichidagi yangi qism) */
+.sidebar-watchlist {
+    padding: 15px;
+    border-top: 1px solid var(--border);
+}
+
+.watchlist-title {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: #848e9c;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+}
+
+.watchlist-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    margin-bottom: 5px;
+    font-size: 0.85rem;
+}
+
+.watchlist-item .price.up { color: var(--success); }
+.watchlist-item .price.down { color: var(--danger); }
+
+.sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.logout-btn {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255, 59, 48, 0.1);
+    color: var(--danger);
+    border: 1px solid rgba(255, 59, 48, 0.2);
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.logout-btn:hover { background: var(--danger); color: white; }
+
+/* MAIN CONTENT */
+.main-content {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    padding: 40px;
+    transition: var(--transition);
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1100px;
     margin: 0 auto;
 }
 
-/* Header */
-.main-header {
-    text-align: center;
-    margin-bottom: 40px;
-}
+/* Header & Dashboard */
+.main-header { margin-bottom: 40px; }
+h1 { color: var(--text-white); font-size: 2.2rem; margin-bottom: 5px; }
 
-h1 { color: var(--text-white); font-size: 2.5rem; margin-bottom: 10px; }
-.welcome-text span { color: var(--accent); font-weight: 700; }
-
-/* Dashboard */
 .dashboard {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 15px;
     margin-bottom: 40px;
 }
@@ -55,45 +181,13 @@ h1 { color: var(--text-white); font-size: 2.5rem; margin-bottom: 10px; }
     padding: 20px;
     border-radius: 12px;
     text-align: center;
-    transition: transform 0.2s;
+    transition: var(--transition);
 }
 
-.dashboard .card:hover { transform: translateY(-5px); }
+.dashboard .card:hover { transform: translateY(-5px); border-color: var(--accent); }
 .dashboard .card i { display: block; margin-bottom: 8px; font-size: 1.4rem; color: var(--accent); }
 .dashboard .card.win i { color: var(--success); }
 .dashboard .card.loss i { color: var(--danger); }
-
-/* Qidiruv tizimi (Search Box) */
-.search-box {
-    margin-bottom: 30px;
-    position: relative;
-}
-
-#searchInput {
-    width: 100%;
-    padding: 15px 20px;
-    background: var(--card-bg);
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    color: var(--text-white);
-    font-size: 1rem;
-    outline: none;
-    transition: all 0.3s ease;
-}
-
-#searchInput:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 15px rgba(41, 98, 255, 0.1);
-}
-
-/* Loading Spinner */
-#loader {
-    display: none;
-    text-align: center;
-    padding: 30px;
-    font-size: 1.1rem;
-    color: var(--accent);
-}
 
 /* Form */
 .form {
@@ -102,21 +196,16 @@ h1 { color: var(--text-white); font-size: 2.5rem; margin-bottom: 10px; }
     border-radius: 16px;
     border: 1px solid var(--border);
     margin-bottom: 50px;
-    transition: all 0.4s ease;
-}
-
-/* Tahrirlash rejimi yonganda formaga ko'k chiziq va soya beradi */
-.form.edit-active {
-    border-color: var(--accent);
-    box-shadow: 0 0 25px var(--edit-glow);
 }
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
 }
-
+.search-box input{
+    width: 100%;
+}
 .field { display: flex; flex-direction: column; gap: 8px; }
 .field.full { grid-column: 1 / -1; }
 
@@ -131,21 +220,9 @@ input, textarea, select {
     color: var(--text-white);
     outline: none;
     transition: 0.2s;
-    font-size: 0.95rem;
 }
 
-input:focus, textarea:focus, select:focus { 
-    border-color: var(--accent); 
-    background: #242a36;
-}
-
-/* Maxsus: Readonly RR maydoni */
-input[name="rr"] {
-    background: rgba(41, 98, 255, 0.05);
-    color: var(--accent);
-    font-weight: 700;
-    cursor: not-allowed;
-}
+input:focus, textarea:focus, select:focus { border-color: var(--accent); }
 
 .textarea-group {
     display: grid;
@@ -163,8 +240,7 @@ input[name="rr"] {
     border-radius: 10px;
     font-weight: 700;
     cursor: pointer;
-    font-size: 1.1rem;
-    transition: all 0.3s;
+    transition: 0.3s;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -173,83 +249,120 @@ input[name="rr"] {
 
 .submit-btn:hover { background: var(--accent-hover); transform: translateY(-2px); }
 
-/* Trade Cards */
-.trades-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.trade-card {
+/* Analytics Chart Placeholder */
+.analytics-chart-box {
+    width: 100%;
+    height: 400px;
     background: var(--card-bg);
-    border: 1px solid var(--border);
-    padding: 20px;
-    border-radius: 12px;
-    transition: all 0.3s;
-}
-
-.trade-card:hover { border-color: #404656; }
-
-.trade-card-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.trade-info-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 25px;
-    align-items: center;
-}
-
-.info-item {
+    border: 1px dashed var(--border);
+    border-radius: 20px;
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 1rem;
-}
-
-.info-item b { color: var(--text-white); font-size: 1.1rem; }
-.info-item i { color: #848e9c; width: 18px; text-align: center; }
-
-/* Status ranglari */
-.status-tp { color: var(--success); font-weight: 700; }
-.status-sl { color: var(--danger); font-weight: 700; }
-.profit-val { font-weight: 800; font-size: 1.1rem; }
-
-/* Harakat tugmalari */
-.trade-actions {
-    display: flex;
-    gap: 15px;
-}
-
-.icon-btn {
-    background: var(--field-bg);
-    border: 1px solid var(--border);
-    cursor: pointer;
-    font-size: 1.1rem;
-    padding: 10px;
-    border-radius: 8px;
-    transition: all 0.2s;
+    justify-content: center;
     color: #848e9c;
 }
-
-.icon-btn.edit:hover {
-    color: var(--accent);
-    background: rgba(41, 98, 255, 0.1);
-    border-color: var(--accent);
+/* 1. Desktop holati (Default) */
+.mobile-only-navbar {
+    display: none; /* Katta ekranda ko'rinmaydi */
 }
 
-.icon-btn.delete:hover {
-    color: var(--danger);
-    background: rgba(255, 59, 48, 0.1);
-    border-color: var(--danger);
-}
 
-/* Responsivlik */
+
+/* 2. Mobil holati (768px dan kichik) */
 @media (max-width: 768px) {
-    .trade-card-content { flex-direction: column; align-items: flex-start; gap: 20px; }
-    .trade-actions { width: 100%; justify-content: flex-end; }
-    .trade-info-list { gap: 15px; }
+    /* Sidebarni butunlay o'chiramiz */
+    .sidebar {
+        display: none !important;
+    }
+
+    /* Main contentni chetdan surilishini to'g'irlaymiz */
+    .main-content {
+        margin-left: 0 !important;
+        padding-top: 150px !important; /* Navbar uchun joy */
+    }
+
+    /* Top Navbarni ko'rsatamiz */
+    .mobile-only-navbar {
+        display: block;
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        background: var(--card-bg);
+        border-bottom: 1px solid var(--border);
+        z-index: 2500;
+        padding-top: 25px;
+        padding-bottom: 25px;
+    }
+
+    .m-nav-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+    }
+
+    .m-logo { display: flex; align-items: center; gap: 10px; font-weight: 700; color: white; }
+    .m-logo img { width: 55px; border-radius: 8px; }
+    .m-logo span{
+        font-size: 20px;
+    }
+
+    .m-burger { background: none; border: none; color: white; font-size: 1.4rem; cursor: pointer;font-size: 30px; }
+
+    /* Dropdown menyu stili */
+    .m-dropdown-menu {
+        display: none; /* Default yopiq */
+        flex-direction: column;
+        background: var(--field-bg);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .m-dropdown-menu.show { display: flex; }
+
+    .m-dropdown-menu a, .m-logout-link {
+        padding: 15px 20px;
+        color: var(--text);
+        text-decoration: none;
+        border-top: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .m-logout-link { background: none; border: none; width: 100%; color: var(--danger); font-weight: 600; }
+    .card{
+        width: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard { grid-template-columns: 1fr; }
+    h1 { font-size: 1.8rem; }
+    .form { padding: 20px; }
+    .mobile-only-navbar{
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
+    .card{
+        width: 330px;
+    }
+    .main-content{
+        padding-top: 50px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .main-header h1{
+        font-size: 30px;
+    }
+    .welcome-text{
+        font-size: 13px;
+    }
+    .m-logo img{
+        width: 40px;
+    }
+    .m-logo span{
+        font-size: 18px;
+    }
+    .m-burger{
+        font-size: 25px;
+    }
 }

@@ -223,3 +223,19 @@ form.addEventListener('input', () => {
 });
 
 document.addEventListener("DOMContentLoaded", () => renderTrades(null));
+
+const mobileBtn = document.getElementById('mobileMenuBtn');
+const mobileDropdown = document.getElementById('mobileDropdown');
+
+if(mobileBtn) {
+    mobileBtn.addEventListener('click', () => {
+        mobileDropdown.classList.toggle('show');
+    });
+}
+
+// Menyu ichidagi biron bo'lim bosilsa, menyu avtomatik yopilsin
+document.querySelectorAll('.m-dropdown-menu a').forEach(link => {
+    link.addEventListener('click', () => {
+        mobileDropdown.classList.remove('show');
+    });
+});

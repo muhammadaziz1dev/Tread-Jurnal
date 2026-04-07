@@ -6,14 +6,15 @@ const nodemailer = require('nodemailer');
 // Email sozlamalari - ENETUNREACH xatosini oldini olish uchun kengaytirilgan
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // Port 465 uchun true
+    port: 587,
+    secure: false, // 587 port uchun false bo'lishi shart
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
     },
     tls: {
-        // Ba'zi tarmoqlardagi ulanish muammolarini chetlab o'tish uchun
+        // Bu qator majburiy ravishda IPv4 dan foydalanishga yordam beradi
+        minVersion: 'TLSv1.2',
         rejectUnauthorized: false
     }
 });

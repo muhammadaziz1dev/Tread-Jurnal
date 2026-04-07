@@ -5,17 +5,18 @@ const nodemailer = require('nodemailer');
 
 // Email sozlamalari - ENETUNREACH xatosini oldini olish uchun kengaytirilgan
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // 587 port uchun false bo'lishi shart
+    // smtp.gmail.com ning IPv4 manzili
+    host: '74.125.131.108', 
+    port: 465,
+    secure: true,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
     },
     tls: {
-        // Bu qator majburiy ravishda IPv4 dan foydalanishga yordam beradi
-        minVersion: 'TLSv1.2',
-        rejectUnauthorized: false
+        // Render va Google o'rtasidagi sertifikat mosligini ta'minlash
+        rejectUnauthorized: false,
+        servername: 'smtp.gmail.com' 
     }
 });
 

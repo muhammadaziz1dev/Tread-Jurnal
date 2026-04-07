@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <title>Hisob ochish - Trading Journal</title>
+    <link rel="stylesheet" href="./css/main.css">
+    <style>
+        body { display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .auth-card { background: var(--card-bg); padding: 40px; border-radius: 16px; border: 1px solid var(--border); width: 100%; max-width: 400px; }
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+        <h2 style="text-align: center; margin-bottom: 20px; color: var(--text-white);">Ro'yxatdan o'tish</h2>
+        <form id="regForm" class="field">
+            <label>Email</label>
+            <input type="email" name="email" placeholder="Emailingizni yozing" required>
+            <label style="margin-top: 15px;">Parol</label>
+            <input type="password" name="password" placeholder="Kamida 6 ta belgi" required minlength="6">
+            <button type="submit" class="submit-btn" style="margin-top: 25px;">Hisobni yaratish</button>
+        </form>
+        <p style="text-align: center; margin-top: 20px; font-size: 0.9rem;">
+            Profilingiz bormi? <a href="login.html" style="color: var(--accent); text-decoration: none;">Kirish</a>
+        </p>
+    </div>
+
+    <script>
+        document.getElementById('regForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = Object.fromEntries(new FormData(e.target));
+            const res = await fetch('https://tread-jurnal.onrender.com/api/trades', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (res.ok) { alert("Ro'yxatdan o'tdingiz!"); window.location.href = 'login.html'; }
+            else { const err = await res.json(); alert(err.message); }
+        });
+    </script>
+</body>
+</html>

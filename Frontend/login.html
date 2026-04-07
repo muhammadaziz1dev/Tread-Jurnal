@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <title>Tizimga kirish - Trading Journal</title>
+    <link rel="stylesheet" href="./css/main.css">
+    <style>
+        body { display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .auth-card { background: var(--card-bg); padding: 40px; border-radius: 16px; border: 1px solid var(--border); width: 100%; max-width: 400px; }
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+        <h2 style="text-align: center; margin-bottom: 20px; color: var(--text-white);">Kirish</h2>
+        <form id="loginForm" class="field">
+            <label>Email</label>
+            <input type="email" name="email" required>
+            <label style="margin-top: 15px;">Parol</label>
+            <input type="password" name="password" required>
+            <button type="submit" class="submit-btn" style="margin-top: 25px;">Kirish</button>
+        </form>
+        <p style="text-align: center; margin-top: 20px; font-size: 0.9rem;">
+            Yangi foydalanuvchimisiz? <a href="register.html" style="color: var(--accent); text-decoration: none;">Ro'yxatdan o'tish</a>
+        </p>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = Object.fromEntries(new FormData(e.target));
+            const res = await fetch('https://tread-jurnal.onrender.com/api/trades', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            if (res.ok) {
+                localStorage.setItem('token', result.token);
+                localStorage.setItem('userEmail', result.user.email);
+                window.location.href = 'index.html';
+            } else { alert(result.message); }
+        });
+    </script>
+</body>
+</html>

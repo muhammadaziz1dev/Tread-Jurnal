@@ -1,6 +1,14 @@
 const TOKEN = "8739866680:AAFwClNNNtv9Cgs36K5fHA_sz6LrtZvb3mQ";
 const CHAT_ID = "8101060085";
 const API_URL = "https://tread-jurnal.onrender.com/api/trades";
+// app.js faylida:
+// const API_URL = "http://localhost:5000/api/trades"; // 10000 emas, sizda terminalda 5000 chiqyapti
+
+// --- AUTH TEKSHIRUVI ---
+const userToken = localStorage.getItem('token');
+if (!userToken) {
+    window.location.href = 'login.html'; // Token bo'lmasa login sahifasiga haydaymiz
+}
 
 const form = document.querySelector("#tradeForm");
 const tradesList = document.querySelector("#tradesList");
@@ -25,18 +33,20 @@ function updateDashboard(trades) {
         return sum + (val || 0);
     }, 0) / total).toFixed(2) : 0;
 
-    document.getElementById("totalTrades").textContent = total;
-    document.getElementById("wins").textContent = wins;
-    document.getElementById("losses").textContent = losses;
-    document.getElementById("winrate").textContent = winrate;
-    document.getElementById("totalProfit").textContent = totalProfit.toLocaleString();
-    document.getElementById("avgRR").textContent = avgRR;
+    if(document.getElementById("totalTrades")) document.getElementById("totalTrades").textContent = total;
+    if(document.getElementById("wins")) document.getElementById("wins").textContent = wins;
+    if(document.getElementById("losses")) document.getElementById("losses").textContent = losses;
+    if(document.getElementById("winrate")) document.getElementById("winrate").textContent = winrate;
+    if(document.getElementById("totalProfit")) document.getElementById("totalProfit").textContent = totalProfit.toLocaleString();
+    if(document.getElementById("avgRR")) document.getElementById("avgRR").textContent = avgRR;
 }
 
-// 2. Telegramga xabar yuborish (Yangi yoki Tahrirlangan)
+// 2. Telegramga xabar yuborish
 async function sendToTelegram(data, isEdit = false) {
     const title = isEdit ? "♻️ <b>TRADE YANGILANDI (EDIT)</b>" : "📊 <b>YANGI TRADE SAQLANDI</b>";
+    const userEmail = localStorage.getItem('userEmail') || "Noma'lum foydalanuvchi";
     const message = `${title}\n` +
+                    `👤 Foydalanuvchi: ${userEmail}\n` + // Kim yuborganini bilish uchun
                     `──────────────────\n` +
                     `📅 Sana: ${data.sana}\n` +
                     `💱 Aktiv: ${data.aktiv}\n` +
@@ -54,14 +64,24 @@ async function sendToTelegram(data, isEdit = false) {
     } catch (e) { console.error("Telegram error:", e); }
 }
 
-// 3. Ma'lumotlarni ko'rsatish
+// 3. Ma'lumotlarni ko'rsatish (Token bilan)
 async function renderTrades(tradesToRender = null) {
     if (loader) loader.style.display = "block";
     
     try {
-        // Agar tashqaridan ma'lumot kelmasa, serverdan yangisini olamiz
         if (tradesToRender === null) {
-            const response = await fetch(API_URL);
+            const response = await fetch(API_URL, {
+                headers: { 
+                    "Content-Type": "application/json",
+                    "x-auth-token": userToken // TOKEnni yuboramiz
+                }
+            });
+
+            if (response.status === 401) {
+                logout(); // Token yaroqsiz bo'lsa chiqib ketadi
+                return;
+            }
+
             allTrades = await response.json();
         }
 
@@ -69,7 +89,7 @@ async function renderTrades(tradesToRender = null) {
         tradesList.innerHTML = "";
         
         if (list.length === 0) {
-            tradesList.innerHTML = "<p style='text-align:center; padding:20px;'>Ma'lumot topilmadi.</p>";
+            tradesList.innerHTML = "<p style='text-align:center; padding:20px;'>Hali ma'lumotlar yo'q.</p>";
         } else {
             list.forEach(trade => {
                 const isWin = String(trade.natija).toLowerCase() === 'win';
@@ -108,7 +128,7 @@ async function renderTrades(tradesToRender = null) {
     }
 }
 
-// 4. Saqlash yoki Yangilash
+// 4. Saqlash yoki Yangilash (Token bilan)
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const formData = new FormData(form);
@@ -120,46 +140,39 @@ form.addEventListener("submit", async (e) => {
     try {
         const response = await fetch(url, {
             method: method,
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "x-auth-token": userToken // TOKENni yuboramiz
+            },
             body: JSON.stringify(data)
         });
 
         if (response.ok) {
-            // Telegramga yuborish (Edit mode bo'lsa ham yuboradi)
             await sendToTelegram(data, editMode);
-            
-            // Rejimni tozalash
             editMode = false;
             editId = null;
             form.reset();
-            
             if (submitBtn) submitBtn.innerHTML = 'Saqlash <i class="fa-solid fa-floppy-disk"></i>';
-            
-            // Muhim: null yuboramizki, renderTrades serverdan yangi ma'lumotni qayta yuklasin
             await renderTrades(null); 
-            alert("Amal muvaffaqiyatli bajarildi! ✅");
+            alert("Muvaffaqiyatli saqlandi! ✅");
         } else {
-            alert("Serverga saqlashda xato yuz berdi.");
+            alert("Xatolik: Ma'lumot saqlanmadi.");
         }
     } catch (e) {
-        alert("Tarmoq xatosi yoki server o'chiq!");
+        alert("Server bilan aloqa yo'q!");
     }
 });
 
-// 5. Tahrirlashni boshlash
+// 5. Tahrirlash
 window.startEdit = function(id) {
     const trade = allTrades.find(t => t._id === id);
     if (!trade) return;
-
     editMode = true;
     editId = id;
-
-    // Formani to'ldirish
     Object.keys(trade).forEach(key => {
         const input = form.elements[key];
         if (input) input.value = trade[key];
     });
-
     if (submitBtn) submitBtn.innerHTML = 'Yangilash <i class="fa-solid fa-rotate"></i>';
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
@@ -176,16 +189,26 @@ if (searchInput) {
     });
 }
 
-// 7. O'chirish
+// 7. O'chirish (Token bilan)
 window.deleteTrade = async function(id) {
-    if (!confirm("Haqiqatdan ham ushbu savdoni o'chirmoqchimisiz?")) return;
+    if (!confirm("O'chirishni xohlaysizmi?")) return;
     try {
-        const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+        const res = await fetch(`${API_URL}/${id}`, { 
+            method: "DELETE",
+            headers: { "x-auth-token": userToken }
+        });
         if (res.ok) await renderTrades(null);
-    } catch (e) { console.error("O'chirishda xato:", e); }
+    } catch (e) { console.error("Xato:", e); }
 };
 
-// 8. Auto RR
+// 8. Logout funksiyasi
+window.logout = function() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userEmail');
+    window.location.href = 'login.html';
+};
+
+// 9. Auto RR hisoblash
 form.addEventListener('input', () => {
     const entry = parseFloat(form.elements['kirish'].value);
     const sl = parseFloat(form.elements['sl'].value);

@@ -25,17 +25,25 @@
     </div>
 
     <script>
-        document.getElementById('regForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const data = Object.fromEntries(new FormData(e.target));
-            const res = await fetch('https://tread-jurnal.onrender.com/api/trades', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            if (res.ok) { alert("Ro'yxatdan o'tdingiz!"); window.location.href = 'login.html'; }
-            else { const err = await res.json(); alert(err.message); }
+    document.getElementById('regForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(e.target));
+        
+        // DIQQAT: /api/trades EMAS, /api/auth/register BO'LISHI KERAK
+        const res = await fetch('https://tread-jurnal.onrender.com/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
         });
-    </script>
+
+        if (res.ok) { 
+            alert("Muvaffaqiyatli ro'yxatdan o'tdingiz! ✅"); 
+            window.location.href = 'login.html'; 
+        } else { 
+            const err = await res.json(); 
+            alert(err.message || "Xatolik yuz berdi"); 
+        }
+    });
+</script>
 </body>
 </html>

@@ -328,3 +328,58 @@ function renderAnalyticsChart(trades) {
         }
     });
 }
+
+// Calc js
+// Kalkulyator elementlarini ushlab olamiz
+const balanceInput = document.getElementById('calcBalance');
+const riskInput = document.getElementById('calcRisk');
+const slInput = document.getElementById('calcSL');
+const resultInput = document.getElementById('calcResult');
+
+// Hisoblash funksiyasi
+function calculateLot() {
+    const balance = parseFloat(balanceInput.value);
+    const riskPercent = parseFloat(riskInput.value);
+    const stopLoss = parseFloat(slInput.value);
+
+    if (balance > 0 && riskPercent > 0 && stopLoss > 0) {
+        // Formula: (Balans * Risk%) / (StopLoss * 10) 
+        // Izoh: 10 koeffitsienti standart lot pips qiymati uchun (Forex)
+        const totalRiskAmount = balance * (riskPercent / 100);
+        const lotSize = totalRiskAmount / (stopLoss * 10);
+
+        // Natijani 2 ta raqamgacha yaxlitlab chiqaramiz
+        resultInput.value = lotSize.toFixed(2);
+    } else {
+        resultInput.value = "0.00";
+    }
+}
+
+// Inputlarga "eshituvchi" qo'shamiz: biror narsa yozilsa funksiya ishlaydi
+[balanceInput, riskInput, slInput].forEach(input => {
+    input.addEventListener('input', calculateLot);
+});
+
+// Real time Live Market
+// Binance WebSocket ulanishi (Faqat BTC va ETH uchun bepul)
+const liveSymbols = ['btcusdt', 'ethusdt'];
+const wsUrl = `wss://stream.binance.com:9443/ws/${liveSymbols.map(s => s + '@ticker').join('/')}`;
+const priceWs = new WebSocket(wsUrl);
+
+priceWs.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    const symbol = data.s.toLowerCase();
+    const price = parseFloat(data.c).toFixed(2);
+    const change = parseFloat(data.P); // 24 soatlik o'zgarish foizi
+
+    const priceElement = document.getElementById(`price-${symbol}`);
+    if (priceElement) {
+        priceElement.innerText = price;
+        // Narx o'zgarishiga qarab rangni yangilash
+        if (change >= 0) {
+            priceElement.className = 'price up';
+        } else {
+            priceElement.className = 'price down';
+        }
+    }
+};

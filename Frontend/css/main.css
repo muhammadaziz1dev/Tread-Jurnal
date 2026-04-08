@@ -428,6 +428,19 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
 .trade-actions i:hover {
     color: white;
 }
+
+#calcResult {
+    background: rgba(41, 98, 255, 0.1) !important;
+    border: 2px solid var(--accent) !important;
+    color: var(--accent) !important;
+    font-weight: 800;
+    font-size: 1.2rem;
+    text-align: center;
+    box-shadow: 0 0 15px var(--edit-glow);
+}
+#calculatorSection{
+    margin-top: 50px;
+}
 /* --- RESPONSIV MEDIA SO'ROVLAR (BREAKPOINTS) --- */
 
 /* Planshetlar uchun (1024px gacha) */

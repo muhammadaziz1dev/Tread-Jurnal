@@ -170,7 +170,7 @@ h1 { color: var(--text-white); font-size: 2.2rem; margin-bottom: 5px; }
 
 .dashboard {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 15px;
     margin-bottom: 40px;
 }
@@ -266,8 +266,204 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
     display: none; /* Katta ekranda ko'rinmaydi */
 }
 
+/* --- ANALITIKA KONTEYNERI --- */
+.analytics-chart-box {
+    background: #1e2329; /* Binance stilidagi to'q fon */
+    border: 1px solid #2b3139;
+    border-radius: 16px;
+    padding: 24px;
+    margin-top: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.24);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
 
+.analytics-chart-box:hover {
+    border-color: rgba(243, 186, 47, 0.4); /* Oltin rangli yengil neon effekti */
+}
 
+/* --- GRAFIK WRAPPER (RESPONSIVLIK KALITI) --- */
+.chart-wrapper {
+    position: relative;
+    width: 100%;
+    height: 450px; /* Kompyuterlar uchun standart balandlik */
+    /* Grafikni neon nuri bilan o'rash */
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
+}
+
+/* --- IZOH (FOOTER) QISMI --- */
+.chart-footer-info {
+    background: rgba(43, 49, 57, 0.4);
+    border-radius: 12px;
+    padding: 16px 20px;
+    border-left: 4px solid #f3ba2f; /* Urg'u beruvchi chiziq */
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.info-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #eaecef;
+}
+
+.info-header i {
+    color: #f3ba2f;
+    font-size: 1.1rem;
+}
+
+.info-header b {
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+}
+
+.chart-footer-info p {
+    margin: 0;
+    color: #848e9c;
+    font-size: 0.92rem;
+    line-height: 1.6;
+}
+#loader{
+    padding-top: 30px;
+    padding-bottom: 30px;
+    text-align: center;
+}
+/* Savdo kartochkalari konteyneri */
+#tradesList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Asosiy kartochka stili */
+.trade-card {
+    background: #1e2329;
+    border-radius: 12px;
+    padding: 16px;
+    border-left: 5px solid #474d57; /* Default holat */
+    border: 1px solid #2b3139;
+    transition: transform 0.2s ease;
+}
+
+.trade-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Win va Loss holatlari uchun ranglar */
+.trade-card.win {
+    border-left: 5px solid #0ecb81;
+}
+
+.trade-card.loss {
+    border-left: 5px solid #f6465d;
+}
+
+/* Kartochka ichidagi elementlar tartibi */
+.trade-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.trade-symbol {
+    font-weight: 700;
+    color: #f3ba2f;
+    font-size: 1.1rem;
+}
+
+.trade-date {
+    color: #848e9c;
+    font-size: 0.85rem;
+}
+
+.trade-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+/* Status belgisi (Win/Loss badge) */
+.trade-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.win .trade-status-badge { background: rgba(14, 203, 129, 0.15); color: #0ecb81; }
+.loss .trade-status-badge { background: rgba(246, 70, 93, 0.15); color: #f6465d; }
+
+.trade-profit {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.win .trade-profit { color: #0ecb81; }
+.loss .trade-profit { color: #f6465d; }
+
+/* Tahrirlash va o'chirish tugmalari */
+.trade-actions {
+    display: flex;
+    gap: 15px;
+}
+
+.trade-actions i {
+    cursor: pointer;
+    color: #848e9c;
+    transition: color 0.2s;
+}
+
+.trade-actions i:hover {
+    color: white;
+}
+/* --- RESPONSIV MEDIA SO'ROVLAR (BREAKPOINTS) --- */
+
+/* Planshetlar uchun (1024px gacha) */
+@media (max-width: 1024px) {
+    .chart-wrapper {
+        height: 380px;
+    }
+    .analytics-chart-box {
+        padding: 20px;
+    }
+}
+
+/* Telefonlar uchun (768px gacha) */
+@media (max-width: 768px) {
+    .analytics-chart-box {
+        padding: 15px;
+        gap: 15px;
+        border-radius: 12px;
+    }
+
+    .chart-wrapper {
+        height: 300px; /* Mobilda grafik siqilmasligi uchun pasaytiramiz */
+    }
+
+    .chart-footer-info {
+        padding: 12px 15px;
+    }
+
+    .chart-footer-info p {
+        font-size: 0.85rem;
+    }
+
+    .info-header b {
+        font-size: 0.9rem;
+    }
+}
 /* 2. Mobil holati (768px dan kichik) */
 @media (max-width: 768px) {
     /* Sidebarni butunlay o'chiramiz */
@@ -329,11 +525,29 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
     }
     
     .m-logout-link { background: none; border: none; width: 100%; color: var(--danger); font-weight: 600; }
-    .card{
-        width: 200px;
-    }
 }
 
+/* Kichik telefonlar uchun (480px gacha) */
+@media (max-width: 480px) {
+    .chart-wrapper {
+        height: 240px;
+    }
+
+    .analytics-chart-box {
+        margin-top: 15px;
+        padding: 12px;
+    }
+
+    .main-header h1 {
+        font-size: 1.4rem;
+    }
+    .chart-footer-info p{
+        font-size: 10px;
+    }
+    .info-header{
+        font-size: 20px;
+    }
+}
 @media (max-width: 480px) {
     .dashboard { grid-template-columns: 1fr; }
     h1 { font-size: 1.8rem; }
@@ -341,14 +555,6 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
     .mobile-only-navbar{
         padding-top: 15px;
         padding-bottom: 15px;
-    }
-    .card{
-        width: 330px;
-    }
-    .main-content{
-        padding-top: 50px;
-        padding-left: 10px;
-        padding-right: 10px;
     }
     .main-header h1{
         font-size: 30px;
@@ -366,3 +572,15 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
         font-size: 25px;
     }
 }
+
+@media (max-width: 400px){
+    .chart-footer-info p{
+        font-size: 8px;
+    }
+    .info-header{
+        font-size: 18px;
+    }
+}
+
+
+

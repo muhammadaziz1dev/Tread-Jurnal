@@ -212,7 +212,10 @@
                 </select>
               </div>
               <div class="field">
-                <label><i class="fa-solid fa-dollar-sign"></i> Foyda</label>
+                <label
+                  ><i class="fa-solid fa-dollar-sign"></i> Foyda/
+                  (-)Ziyon</label
+                >
                 <input type="number" step="any" name="foyda" required />
               </div>
               <div class="field">
@@ -294,6 +297,9 @@
           <div id="tradesList" class="trades-container"></div>
         </section>
 
+        <!-- Chart.js -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
         <section id="analyticsSection" style="display: none">
           <header class="main-header">
             <h1>Savdo Analitikasi</h1>
@@ -301,14 +307,26 @@
               Sizning savdo natijalaringiz vizual ko'rinishda
             </p>
           </header>
+
           <div class="analytics-chart-box">
-            <p>
-              <i class="fa-solid fa-chart-line"></i> Grafiklar tez kunda
-              Chart.js orqali ulanadi...
-            </p>
+            <div class="chart-wrapper">
+              <canvas id="tradingAnalyticsChart"></canvas>
+            </div>
+
+            <div class="chart-footer-info">
+              <div class="info-header">
+                <i class="fa-solid fa-circle-info"></i>
+                <b>Grafik bo'yicha yo'riqnoma</b>
+              </div>
+              <p>
+                Bu grafik har bir aktiv bo'yicha yig'ilib boruvchi kapitalni
+                (Cumulative Equity) ko'rsatadi. Chiziq yuqoriga o'ssa - kapital
+                o'smoqda, pastga tushsa - zarar ko'rilmoqda. Har bir nuqta o'sha
+                kungi barcha savdolardan keyingi umumiy balansingizni anglatadi.
+              </p>
+            </div>
           </div>
         </section>
-
         <section id="calculatorSection" style="display: none">
           <header class="main-header">
             <h1>Risk Kalkulyatori</h1>

@@ -73,12 +73,12 @@ async function renderTrades(tradesToRender = null) {
             const response = await fetch(API_URL, {
                 headers: { 
                     "Content-Type": "application/json",
-                    "x-auth-token": userToken // TOKEnni yuboramiz
+                    "x-auth-token": userToken 
                 }
             });
 
             if (response.status === 401) {
-                logout(); // Token yaroqsiz bo'lsa chiqib ketadi
+                logout(); 
                 return;
             }
 
@@ -89,38 +89,41 @@ async function renderTrades(tradesToRender = null) {
         tradesList.innerHTML = "";
         
         if (list.length === 0) {
-            tradesList.innerHTML = "<p style='text-align:center; padding:20px;'>Hali ma'lumotlar yo'q.</p>";
+            tradesList.innerHTML = "<p style='text-align:center; color: #848e9c; padding:20px;'>Hali ma'lumotlar yo'q.</p>";
         } else {
             list.forEach(trade => {
                 const isWin = String(trade.natija).toLowerCase() === 'win';
+                const cardClass = isWin ? 'win' : 'loss';
+                
                 const card = document.createElement("div");
-                card.className = `trade-card ${trade.natija}`;
+                // Klasslarni bizning yangi CSS'ga mosladik
+                card.className = `trade-card ${cardClass}`; 
+                
                 card.innerHTML = `
-                    <div class="trade-card-content">
-                        <div class="trade-info-list">
-                            <div class="info-item"><i class="fa-regular fa-calendar"></i> ${trade.sana || '---'}</div>
-                            <div class="info-item"><b>${trade.aktiv || '---'}</b></div>
-                            <div class="info-item ${isWin ? 'status-tp' : 'status-sl'}">
+                    <div class="trade-card-header">
+                        <span class="trade-symbol">${trade.aktiv || '---'}</span>
+                        <span class="trade-date"><i class="fa-regular fa-calendar"></i> ${trade.sana || '---'}</span>
+                    </div>
+                    <div class="trade-body">
+                        <div class="trade-info-left">
+                            <span class="trade-status-badge">
                                 <i class="fa-solid ${isWin ? 'fa-circle-check' : 'fa-circle-xmark'}"></i> 
                                 ${(trade.natija || '---').toUpperCase()}
-                            </div>
-                            <div class="info-item profit-val" style="color: ${parseFloat(trade.foyda) >= 0 ? '#00c805' : '#ff3b30'}">
-                                <b>${trade.foyda || 0} USD</b>
+                            </span>
+                            <div class="trade-profit">
+                                ${parseFloat(trade.foyda) >= 0 ? '+' : ''}${trade.foyda || 0} USD
                             </div>
                         </div>
                         <div class="trade-actions">
-                            <button class="icon-btn edit" onclick="startEdit('${trade._id}')">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                            </button>
-                            <button class="icon-btn delete" onclick="deleteTrade('${trade._id}')">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
+                            <i class="fa-solid fa-pen-to-square" title="Tahrirlash" onclick="startEdit('${trade._id}')"></i>
+                            <i class="fa-solid fa-trash-can" title="O'chirish" onclick="deleteTrade('${trade._id}')"></i>
                         </div>
                     </div>`;
                 tradesList.appendChild(card);
             });
         }
         updateDashboard(list);
+        renderAnalyticsChart(list);
     } catch (e) { 
         console.error("Render xatosi:", e); 
     } finally {
@@ -239,3 +242,89 @@ document.querySelectorAll('.m-dropdown-menu a').forEach(link => {
         mobileDropdown.classList.remove('show');
     });
 });
+
+// CHART JS
+// Grafik obyekti (qayta chizish uchun)
+let myChart = null;
+
+function renderAnalyticsChart(trades) {
+    const ctx = document.getElementById('tradingAnalyticsChart').getContext('2d');
+
+    // Agar grafik oldin chizilgan bo'lsa, uni o'chirib yangisini chizamiz
+    if (myChart) { myChart.destroy(); }
+
+    // 1. Sanalarni tartib bilan olish (X o'qi)
+    const dates = [...new Set(trades.map(t => t.sana))].sort();
+
+    // 2. Mavjud paralar va ranglar palitrasi
+    const symbols = [...new Set(trades.map(t => t.aktiv))];
+    const colors = ['#f3ba2f', '#0ecb81', '#f6465d', '#3273dc', '#9b59b6'];
+
+    // 3. Har bir para uchun professional dataset yaratish
+    const datasets = symbols.map((symbol, i) => {
+        let runningTotal = 0; // Jami kapitalni hisoblash uchun
+        const color = colors[i % colors.length];
+
+        return {
+            label: symbol,
+            // Cumulative (yig'ilib boruvchi) ma'lumotlar
+            data: dates.map(date => {
+                const dayTrades = trades.filter(t => t.aktiv === symbol && t.sana === date);
+                const dayProfit = dayTrades.reduce((sum, t) => sum + parseFloat(t.foyda || 0), 0);
+                runningTotal += dayProfit;
+                return runningTotal; // Har bir kundagi jami kapital
+            }),
+            borderColor: color,
+            // --- PROFESSIONAL STIL ---
+            backgroundColor: color + '10', // Area fill (shaffof fon)
+            fill: true, // Chiziq tagini bo'yash
+            tension: 0.4, // Chiziqni silliq (smooth) qilish
+            borderWidth: 3,
+            pointRadius: 4,
+            pointBackgroundColor: color,
+            pointBorderColor: '#1e2329',
+            pointBorderWidth: 2,
+            spanGaps: true // Bo'sh kunlarni bog'lab ketadi
+        };
+    });
+
+    // 4. Grafikni yaratish
+    myChart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: dates, datasets: datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false },
+                    ticks: { color: '#848e9c', font: { size: 10 }, callback: value => '$ ' + value } // $ belgisi
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#848e9c', font: { size: 10 } }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: { color: '#eaecef', font: { size: 12 }, padding: 15, usePointStyle: true }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    backgroundColor: '#2b3139',
+                    titleColor: '#eaecef',
+                    bodyColor: '#848e9c',
+                    borderColor: '#474d57',
+                    borderWidth: 1,
+                    callbacks: {
+                        label: context => `${context.dataset.label}: $${context.parsed.y.toFixed(2)}`
+                    }
+                }
+            },
+            // Kursorni olib borganda chiziq ko'rsatishi
+            interaction: { mode: 'nearest', axis: 'x', intersect: false }
+        }
+    });
+}

@@ -383,3 +383,57 @@ priceWs.onmessage = (event) => {
         }
     }
 };
+
+// --- AI MENTOR BO'LIMI UCHUN MAXSUS KODLAR ---
+
+/**
+ * Serverdan barcha treydlarni oladi va 
+ * faqat AI tahlili (aiFeedback) borlarini ekranga chiqaradi
+ */
+async function loadAIMentor() {
+    const container = document.getElementById('aiResponseContainer');
+    if (!container) return;
+
+    container.innerHTML = `<div style="color:var(--accent); text-align:center; grid-column: 1/-1; padding: 50px;">
+        <i class="fas fa-brain fa-spin fa-2x"></i><br><br>AI tahlil qilmoqda...</div>`;
+
+    try {
+        const response = await fetch(API_URL, {
+            headers: { "x-auth-token": localStorage.getItem("token") }
+        });
+        const trades = await response.json();
+        container.innerHTML = "";
+
+        const aiTrades = trades.filter(t => t.aiFeedback).reverse();
+
+        if (aiTrades.length === 0) {
+            container.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 40px; color:var(--text);">Hozircha AI tahlillari yo'q.</div>`;
+            return;
+        }
+
+        aiTrades.forEach(trade => {
+            const isWin = trade.natija.toLowerCase() === 'win';
+            container.innerHTML += `
+                <div class="ai-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="color:var(--text); font-weight:600;">${trade.aktiv}</span>
+                        <span style="color: ${isWin ? 'var(--success)' : 'var(--danger)'}; font-size: 0.8rem; font-weight:bold; text-transform:uppercase;">
+                            ${trade.natija}
+                        </span>
+                    </div>
+                    <div class="ai-feedback-box">
+                        <p class="ai-feedback-text">
+                            <i class="fas fa-robot"></i> ${trade.aiFeedback}
+                        </p>
+                    </div>
+                    <div class="ai-card-stats">
+                        <span style="color:var(--success)">+$${trade.foyda}</span>
+                        <span style="color:var(--text)">${trade.sana}</span>
+                    </div>
+                </div>
+            `;
+        });
+    } catch (error) {
+        container.innerHTML = `<p style="color:var(--danger); grid-column: 1/-1; text-align:center;">Xatolik yuz berdi!</p>`;
+    }
+}

@@ -1,34 +1,40 @@
 const mongoose = require('mongoose');
 
 const tradeSchema = new mongoose.Schema({
-    // Foydalanuvchini bog'lash (Eng muhim qator!)
-    userId: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'User', 
-        required: true 
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     },
-    // Sizning server.js dagi barcha maydonlaringiz:
-    sana: String,
-    vaqt: String,
-    aktiv: String,
-    strategiya: String,
-    trend: String,
-    balans: mongoose.Schema.Types.Mixed,
-    kirish: mongoose.Schema.Types.Mixed,
-    sl: mongoose.Schema.Types.Mixed,
-    tp: mongoose.Schema.Types.Mixed,
-    rr: mongoose.Schema.Types.Mixed,
-    lot: mongoose.Schema.Types.Mixed,
-    natija: String,
-    foyda: mongoose.Schema.Types.Mixed,
-    risk: mongoose.Schema.Types.Mixed,
-    davom: String,
-    sabab: String,
-    oldHiss: String,
-    jarayonHiss: String,
-    yakunHiss: String,
-    xato: String,
-    togri: String
-}, { timestamps: true }); // yaratilgan vaqtini avtomatik saqlaydi
+    sana: { type: String, required: true },
+    vaqt: { type: String },
+    aktiv: { type: String, required: true },
+    strategiya: { type: String },
+    trend: { type: String },
+    balans: { type: Number },
+    kirish: { type: Number },
+    sl: { type: Number },
+    tp: { type: Number },
+    rr: { type: String },
+    lot: { type: Number },
+    natija: { type: String, enum: ['win', 'loss'], required: true },
+    foyda: { type: Number, required: true },
+    risk: { type: Number },
+    davom: { type: String },
+    sabab: { type: String },
+    
+    // Hissiyotlar va tahlillar
+    oldHiss: { type: String },
+    jarayonHiss: { type: String },
+    yakunHiss: { type: String },
+    xato: { type: String },
+    togri: { type: String },
+    
+    // --- AI TAHLILI UCHUN JOY ---
+    aiFeedback: { 
+        type: String, 
+        default: "" 
+    }
+}, { timestamps: true });
 
 module.exports = mongoose.model('Trade', tradeSchema);

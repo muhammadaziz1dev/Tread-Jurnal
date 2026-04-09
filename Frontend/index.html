@@ -353,24 +353,32 @@
             </div>
           </div>
         </section>
+        <section id="aiMentorSection" style="display: none">
+          <div class="card shadow-lg bg-dark text-white p-4">
+            <h3 class="text-primary">
+              <i class="fas fa-brain"></i> Shaxsiy AI Mentor
+            </h3>
+            <hr />
+            <div id="aiResponseContainer">
+              <p class="text-muted">
+                Treydlaringizni tahlil qilish uchun "Saqlash" tugmasini
+                bosing...
+              </p>
+            </div>
+          </div>
+        </section>
       </div>
     </main>
 
     <script src="./js/app.js"></script>
     <script>
-      // Foydalanuvchi ismini ko'rsatish
-      const userEmail = localStorage.getItem("userEmail");
-      if (userEmail) {
-        document.getElementById("userNameDisplay").textContent =
-          userEmail.split("@")[0];
-      }
-
-      // Bo'limlarni almashtirish funksiyasi
+      // Bo'limlarni almashtirish funksiyasi (AI Mentor qo'shilgan holatda)
       function showSection(section) {
-        // Hamma sectionlarni yashirish
+        // Barcha sectionlarni yashirish
         document.getElementById("dashboardSection").style.display = "none";
         document.getElementById("analyticsSection").style.display = "none";
         document.getElementById("calculatorSection").style.display = "none";
+        document.getElementById("aiMentorSection").style.display = "none"; // Yangi qo'shildi
 
         // Navigatsiya linklaridan 'active' klassini olib tashlash
         document
@@ -380,20 +388,20 @@
         // Tanlangan sectionni ko'rsatish
         if (section === "dashboard") {
           document.getElementById("dashboardSection").style.display = "block";
-          event.currentTarget.classList.add("active");
         } else if (section === "analytics") {
           document.getElementById("analyticsSection").style.display = "block";
-          event.currentTarget.classList.add("active");
         } else if (section === "calculator") {
           document.getElementById("calculatorSection").style.display = "block";
+        } else if (section === "ai-mentor") {
+          document.getElementById("aiMentorSection").style.display = "block";
+          // AI Mentor ochilganda ma'lumotlarni yuklash (app.js dagi funksiya)
+          if (typeof loadAIMentor === "function") loadAIMentor();
+        }
+
+        // Active klassini qo'shish
+        if (event && event.currentTarget) {
           event.currentTarget.classList.add("active");
         }
-      }
-
-      function logout() {
-        localStorage.removeItem("token");
-        localStorage.removeItem("userEmail");
-        window.location.href = "login.html";
       }
     </script>
   </body>
